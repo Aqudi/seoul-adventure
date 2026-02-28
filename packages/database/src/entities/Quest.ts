@@ -39,7 +39,7 @@ export class Quest {
   @ManyToOne(() => Place, { nullable: true })
   place?: Place;
 
-  @Property()
+  @Property({ type: 'integer' })
   order!: number;
 
   @Enum(() => QuestType)
@@ -54,7 +54,7 @@ export class Quest {
   @Property({ type: "text" })
   mapHint!: string;
 
-  @Property({ nullable: true })
+  @Property({ type: 'string', nullable: true })
   answer?: string;
 
   @Property({ type: "double", nullable: true })
@@ -63,10 +63,10 @@ export class Quest {
   @Property({ type: "double", nullable: true })
   gpsLngOverride?: number;
 
-  @Property({ nullable: true })
+  @Property({ type: 'integer', nullable: true })
   gpsRadiusM?: number;
 
-  @Property({ nullable: true })
+  @Property({ type: 'integer', nullable: true })
   timeLimitSec?: number;
 
   @OneToMany("QuestState", "quest")

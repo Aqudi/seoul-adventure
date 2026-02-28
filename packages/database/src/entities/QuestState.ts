@@ -33,9 +33,9 @@ export class QuestState {
   @Enum(() => QuestStatus)
   status: QuestStatus = QuestStatus.PENDING;
 
-  @Property({ nullable: true })
+  @Property({ type: 'datetime', nullable: true })
   completedAt?: Date;
 
-  @Property({ nullable: true })
+  @Property({ type: 'string', nullable: true })
   photoUrl?: string;
 }

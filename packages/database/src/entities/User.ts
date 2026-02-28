@@ -16,13 +16,13 @@ export class User {
   @PrimaryKey()
   id: string = uuid();
 
-  @Property({ unique: true })
+  @Property({ unique: true, type: 'string' })
   nickname!: string;
 
-  @Property()
+  @Property({ type: 'string' })
   password!: string; // bcrypt hashed
 
-  @Property()
+  @Property({ type: 'datetime' })
   createdAt: Date = new Date();
 
   @OneToMany("Attempt", "user")

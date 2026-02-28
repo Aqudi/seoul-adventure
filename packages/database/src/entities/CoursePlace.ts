@@ -10,6 +10,6 @@ export class CoursePlace {
   @ManyToOne(() => Place, { primary: true })
   place!: Place;
 
-  @Property()
+  @Property({ type: 'integer' })
   order!: number;
 }

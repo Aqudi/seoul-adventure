@@ -22,7 +22,7 @@ export class Place {
   @PrimaryKey()
   id: string = uuid();
 
-  @Property()
+  @Property({ type: 'string' })
   name!: string;
 
   @Property({ type: "double" })
@@ -34,7 +34,7 @@ export class Place {
   @Property({ type: "array" })
   landmarkNames: string[] = [];
 
-  @Property({ nullable: true })
+  @Property({ type: 'string', nullable: true })
   imageUrl?: string;
 
   @Property({ type: "json", nullable: true })

@@ -27,14 +27,14 @@ export class Attempt {
   @Enum(() => AttemptStatus)
   status: AttemptStatus = AttemptStatus.IN_PROGRESS;
 
-  @Property()
+  @Property({ type: 'datetime' })
   startAt: Date = new Date();
 
-  @Property({ nullable: true })
+  @Property({ type: 'datetime', nullable: true })
   endAt?: Date;
 
   @Index()
-  @Property({ nullable: true })
+  @Property({ type: 'integer', nullable: true })
   clearTimeMs?: number;
 
   @OneToMany('QuestState', 'attempt')

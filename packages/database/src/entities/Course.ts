@@ -32,17 +32,17 @@ export class Course {
   @PrimaryKey()
   id: string = uuid();
 
-  @Property()
+  @Property({ type: 'string' })
   title!: string;
 
-  @Property()
+  @Property({ type: 'string' })
   theme!: string;
 
   @Index()
-  @Property()
+  @Property({ type: 'string' })
   weekKey!: string;
 
-  @Property()
+  @Property({ type: 'integer' })
   estimatedDuration!: number;
 
   @Enum(() => Difficulty)
@@ -54,10 +54,10 @@ export class Course {
   @Property({ type: "text" })
   epilogue!: string;
 
-  @Property()
+  @Property({ type: 'boolean' })
   isActive: boolean = true;
 
-  @Property()
+  @Property({ type: 'datetime' })
   createdAt: Date = new Date();
 
   @OneToMany("CoursePlace", "course")
