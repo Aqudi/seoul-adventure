@@ -101,7 +101,6 @@ export type AttemptDto = Static<typeof AttemptDtoSchema>;
 
 /** CoursePlace 조인 테이블 DTO - 코스 내 장소 순서 포함 */
 export const CoursePlaceDtoSchema = Type.Object({
-  id: Type.String(),
   order: Type.Number(),
   place: PlaceDtoSchema,
 });
