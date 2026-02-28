@@ -17,6 +17,7 @@ export const QuestTypeSchema = Type.Union([
   Type.Literal('PHOTO'),
   Type.Literal('ANSWER'),
   Type.Literal('GPS_TIME'),
+  Type.Literal('VOICE'),
 ]);
 export type QuestType = Static<typeof QuestTypeSchema>;
 

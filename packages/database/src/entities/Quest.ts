@@ -17,6 +17,7 @@ export enum QuestType {
   PHOTO = "PHOTO",
   ANSWER = "ANSWER",
   GPS_TIME = "GPS_TIME",
+  VOICE = "VOICE",
 }
 
 @Entity()

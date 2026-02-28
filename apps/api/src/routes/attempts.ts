@@ -20,6 +20,7 @@ import { join, extname } from 'path';
 import { randomUUID } from 'crypto';
 import { UPLOAD_DIR } from '../lib/uploadDir.js';
 import { haversineDistance } from '../lib/geo.js';
+import { analyzePhoto } from '../lib/photoAnalyzer.js';
 
 export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
   fastify.post(
@@ -103,8 +104,46 @@ export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
         const data = await (request as any).file();
         const ext = extname(data.filename) || '.jpg';
         const filename = `${randomUUID()}${ext}`;
-        await writeFile(join(UPLOAD_DIR, filename), await data.toBuffer());
+        const buffer = await data.toBuffer();
+        await writeFile(join(UPLOAD_DIR, filename), buffer);
         questState.photoUrl = `/uploads/${filename}`;
+
+        // EXIF GPS 검증: 클라이언트가 exifr로 추출한 좌표를 multipart fields로 전송한 경우
+        const exifLat = data.fields?.exifLat?.value;
+        const exifLng = data.fields?.exifLng?.value;
+        if (exifLat != null && exifLng != null) {
+          await em.populate(quest, ['place']);
+          const targetLat = quest.gpsLatOverride ?? quest.place?.lat;
+          const targetLng = quest.gpsLngOverride ?? quest.place?.lng;
+          if (targetLat != null && targetLng != null) {
+            const dist = haversineDistance(
+              parseFloat(exifLat),
+              parseFloat(exifLng),
+              targetLat,
+              targetLng,
+            );
+            const radiusM = quest.gpsRadiusM ?? 500;
+            if (dist > radiusM) {
+              return reply.code(422).send({
+                error: `사진 촬영 위치가 목적지와 너무 멉니다. (현재 거리: ${Math.round(dist)}m)`,
+              });
+            }
+          }
+        }
+
+        // AI 사진 분석: GEMINI_API_KEY가 설정된 경우에만 실행
+        if (process.env.GEMINI_API_KEY) {
+          const mimeType: string = data.mimetype || 'image/jpeg';
+          const analysis = await analyzePhoto(
+            buffer,
+            mimeType,
+            quest.instruction,
+            quest.narrativeText,
+          );
+          if (!analysis.passed && analysis.confidence >= 0.7) {
+            return reply.code(422).send({ error: analysis.reason });
+          }
+        }
       }
 
       if (quest.type === 'ANSWER') {

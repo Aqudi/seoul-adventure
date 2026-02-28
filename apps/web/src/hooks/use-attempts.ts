@@ -5,13 +5,14 @@ import {
   startAttempt,
   getAttempt,
   completeAnswerQuest,
-  completeGpsQuest
+  completeGpsQuest,
+  completePhotoQuest,
 } from "@/lib/api/attempts";
 import {
   AttemptResponse,
   StartAttemptBody,
   CompleteAnswerQuestBody,
-  CompleteGpsQuestBody
+  CompleteGpsQuestBody,
 } from "@seoul-advanture/schemas";
 
 export function useAttempt(id?: string) {
@@ -20,7 +21,7 @@ export function useAttempt(id?: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (typeof id !== 'string') return;
+    if (typeof id !== "string") return;
     async function load() {
       setIsLoading(true);
       try {
@@ -49,16 +50,30 @@ export function useAttempt(id?: string) {
     }
   };
 
+  /** ANSWER 퀘스트 완료 */
   const handleVerifyAnswer = async (questId: string, body: CompleteAnswerQuestBody) => {
     if (!data) return null;
-    try {
-      const res = await completeAnswerQuest(data.id, questId, body);
-      return res;
-    } catch (err) {
-      setError(err as Error);
-      return null;
-    }
+    const res = await completeAnswerQuest(data.id, questId, body);
+    return res;
   };
 
-  return { data, isLoading, error, handleStart, handleVerifyAnswer };
+  /** GPS_TIME 퀘스트 완료 */
+  const handleVerifyGps = async (questId: string, body: CompleteGpsQuestBody) => {
+    if (!data) return null;
+    const res = await completeGpsQuest(data.id, questId, body);
+    return res;
+  };
+
+  /** PHOTO 퀘스트 완료 - blob + 선택적 GPS 좌표 */
+  const handleVerifyPhoto = async (
+    questId: string,
+    blob: Blob,
+    location?: { lat: number; lng: number },
+  ) => {
+    if (!data) return null;
+    const res = await completePhotoQuest(data.id, questId, blob, location);
+    return res;
+  };
+
+  return { data, isLoading, error, handleStart, handleVerifyAnswer, handleVerifyGps, handleVerifyPhoto };
 }

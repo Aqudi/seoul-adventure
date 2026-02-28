@@ -19,7 +19,7 @@ export enum QuestStatus {
 @Entity()
 @Unique({ properties: ["attempt", "quest"] })
 export class QuestState {
-  [OptionalProps]?: "status" | "completedAt" | "photoUrl";
+  [OptionalProps]?: "status" | "completedAt" | "photoUrl" | "audioUrl";
 
   @PrimaryKey()
   id: string = uuid();
@@ -38,4 +38,7 @@ export class QuestState {
 
   @Property({ type: 'string', nullable: true })
   photoUrl?: string;
+
+  @Property({ type: 'string', nullable: true })
+  audioUrl?: string;
 }
