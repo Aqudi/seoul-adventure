@@ -1,11 +1,15 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import MobileLayout, { StatusBar } from "@/components/mobile-layout";
+import MobileLayout from "@/components/mobile-layout";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   return (
     <MobileLayout>
-      <StatusBar />
       <div className="flex flex-1 flex-col gap-6 px-5 py-[20px] pb-6">
         {/* Header */}
         <div className="flex flex-col gap-2">
@@ -21,7 +25,7 @@ export default function LoginPage() {
 
         {/* AI Banner */}
         <div className="flex flex-col gap-2 border-[3px] border-seoul-text bg-seoul-accent p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
-          <span className="text-[10px] font-bold tracking-widest text-seoul-card">
+          <span className="text-[10px] font-bold tracking-widest text-seoul-card uppercase">
             이번 주 AI 추천 코스
           </span>
           <h2 className="text-[18px] font-extrabold text-white">
@@ -38,8 +42,8 @@ export default function LoginPage() {
             <label className="text-[12px] font-bold tracking-widest text-seoul-muted uppercase">
               이름 없는 탐험가 명부
             </label>
-            <Input
-              placeholder="이메일 혹은 별호"
+            <Input 
+              placeholder="이메일 혹은 별호" 
               className="h-14 border-[3px] border-seoul-text bg-white px-4 text-base rounded-none focus-visible:ring-0"
             />
           </div>
@@ -48,9 +52,9 @@ export default function LoginPage() {
             <label className="text-[12px] font-bold tracking-widest text-seoul-muted uppercase">
               암호 문장
             </label>
-            <Input
+            <Input 
               type="password"
-              placeholder="••••••••"
+              placeholder="••••••••" 
               className="h-14 border-[3px] border-seoul-text bg-white px-4 text-base rounded-none focus-visible:ring-0"
             />
           </div>
@@ -58,12 +62,13 @@ export default function LoginPage() {
 
         {/* CTA Buttons */}
         <div className="mt-auto flex flex-col gap-3">
-          <Button
+          <Button 
+            onClick={() => router.push("/courses")}
             className="h-14 border-[3px] border-seoul-text bg-seoul-text text-seoul-card hover:bg-seoul-text/90 text-base font-bold rounded-none"
           >
             탐험 시작
           </Button>
-          <Button
+          <Button 
             variant="secondary"
             className="h-14 border-[3px] border-seoul-text text-base font-bold rounded-none shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
           >
