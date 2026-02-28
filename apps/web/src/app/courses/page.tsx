@@ -11,11 +11,45 @@ export default function CoursesPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"map" | "list">("list");
 
+  // @seoul-advanture/schemas 기반 데이터 구조로 변경
   const courses = [
-    { id: 1, title: "경복궁 근정전", info: "난이도: 중 · 예상 소요: 48분", lat: 37.5786, lng: 126.9772 },
-    { id: 2, title: "창경궁 문정전", info: "난이도: 하 · 예상 소요: 36분", lat: 37.5800, lng: 126.9918 },
-    { id: 3, title: "종묘 정전", info: "난이도: 상 · 예상 소요: 62분", lat: 37.5746, lng: 126.9942 },
+    { 
+      id: "c1", 
+      title: "경복궁 근정전", 
+      theme: "조선 왕실의 권위",
+      weekKey: "2024-W09",
+      difficulty: "MEDIUM", 
+      estimatedDuration: 48,
+      isActive: true,
+      places: [{ id: "p1", order: 1, place: { lat: 37.5786, lng: 126.9772, name: "근정전", id: "pl1", landmarkNames: ["근정전"] } }]
+    },
+    { 
+      id: "c2", 
+      title: "창경궁 문정전", 
+      theme: "비극의 역사",
+      weekKey: "2024-W09",
+      difficulty: "EASY", 
+      estimatedDuration: 36,
+      isActive: true,
+      places: [{ id: "p2", order: 1, place: { lat: 37.5800, lng: 126.9918, name: "문정전", id: "pl2", landmarkNames: ["문정전"] } }]
+    },
+    { 
+      id: "c3", 
+      title: "종묘 정전", 
+      theme: "신들의 정원",
+      weekKey: "2024-W09",
+      difficulty: "HARD", 
+      estimatedDuration: 62,
+      isActive: true,
+      places: [{ id: "p3", order: 1, place: { lat: 37.5746, lng: 126.9942, name: "종묘", id: "pl3", landmarkNames: ["종묘"] } }]
+    },
   ];
+
+  const difficultyMap = {
+    EASY: "하",
+    MEDIUM: "중",
+    HARD: "상"
+  };
 
   return (
     <MobileLayout>
@@ -86,7 +120,7 @@ export default function CoursesPage() {
                         {course.title}
                       </CardTitle>
                       <CardDescription className="text-[13px] font-medium text-[#5C5852]">
-                        {course.info}
+                        난이도: {difficultyMap[course.difficulty as keyof typeof difficultyMap]} · 예상 소요: {course.estimatedDuration}분
                       </CardDescription>
                     </CardHeader>
                   </Card>
@@ -95,7 +129,7 @@ export default function CoursesPage() {
             ) : (
               <div className="w-full h-full relative">
                 <GoogleMapView 
-                    spots={courses.map(c => ({ lat: c.lat, lng: c.lng, title: c.title }))} 
+                    spots={courses.map(c => ({ lat: c.places[0].place.lat, lng: c.places[0].place.lng, title: c.title }))} 
                     className="w-full h-full" 
                 />
                 <div className="absolute top-2 right-2 bg-black/70 text-white text-[10px] p-1 px-2 pointer-events-none">

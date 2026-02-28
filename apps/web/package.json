@@ -38,6 +38,7 @@
   "devDependencies": {
     "@seoul-advanture/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
+    "@types/google.maps": "^3.58.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
