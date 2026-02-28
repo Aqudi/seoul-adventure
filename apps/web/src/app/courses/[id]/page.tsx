@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import GoogleMapView from "@/components/google-map-view";
-import TimerDisplay from "@/components/timer-display";
 import { useCourseDetail } from "@/hooks/use-courses";
 import { useAttempt } from "@/hooks/use-attempts";
-import { useQuestStore } from "@/hooks/use-quest-store";
 import { DetailSkeleton } from "@/components/page-skeletons";
 import { Loader2 } from "lucide-react";
 
@@ -21,7 +19,6 @@ export default function CourseDetailPage() {
   
   const { data: course, isLoading: isCourseLoading, error } = useCourseDetail(id);
   const { handleStart, isLoading: isStarting } = useAttempt();
-  const startTimer = useQuestStore((state) => state.startQuest);
 
   const difficultyMap = {
     EASY: "하",
@@ -32,13 +29,11 @@ export default function CourseDetailPage() {
   const onStartAdventure = async () => {
     if (!id) return;
     
-    // 1. 서버에 탐험 시작 요청
+    // 1. 서버에 탐험 시작 요청 (attemptId 획득)
     const res = await handleStart({ courseId: id });
     
     if (res) {
-      // 2. 로컬 타이머 및 시도 ID 저장
-      startTimer(res.id);
-      // 3. 발급받은 attemptId와 함께 퀘스트 페이지로 이동
+      // 2. 타이머는 여기서 시작하지 않고, 퀘스트 페이지로 이동만 함
       router.push(`/quests?step=1&courseId=${id}&attemptId=${res.id}`);
     } else {
       alert("성문지기가 입장을 불허했소. (서버 연결 실패)");
@@ -97,7 +92,7 @@ export default function CourseDetailPage() {
                 난이도 {difficultyMap[course.difficulty as keyof typeof difficultyMap]}
               </Badge>
             </div>
-            <TimerDisplay />
+            {/* 상세 페이지에서는 타이머를 의도적으로 노출하지 않음 */}
           </div>
         </div>
 

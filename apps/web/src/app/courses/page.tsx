@@ -19,8 +19,7 @@ function CoursesContent() {
   const { data: courses, isLoading } = useCourses();
 
   const onSelectCourse = (id: string) => {
-    startQuest(); // 타이머 시작
-    router.push(`/courses/${id}`); // ID를 포함한 경로로 이동
+    router.push(`/courses/${id}`); // ID를 포함한 경로로 이동 (타이머 시작 안함)
   };
 
   const difficultyMap = {

@@ -5,10 +5,11 @@ import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useEffect } from "react";
 import TimerDisplay from "@/components/timer-display";
 import { useAttempt } from "@/hooks/use-attempts";
 import { DetailSkeleton } from "@/components/page-skeletons";
+import { useQuestStore } from "@/hooks/use-quest-store";
 
 function QuestMainContent() {
   const router = useRouter();
@@ -18,6 +19,14 @@ function QuestMainContent() {
   const courseId = searchParams.get("courseId");
 
   const { data: attempt, isLoading, error } = useAttempt(attemptId || undefined);
+  const { startQuest, startTime } = useQuestStore();
+
+  // 1단계 진입 시 타이머 시작 (아직 시작되지 않았을 때만)
+  useEffect(() => {
+    if (step === 1 && attemptId && !startTime) {
+      startQuest(attemptId);
+    }
+  }, [step, attemptId, startTime, startQuest]);
 
   // 스키마 구조 분석 결과: attempt.questStates 내부에 quest 정보가 있음
   const currentQuest = useMemo(() => {
