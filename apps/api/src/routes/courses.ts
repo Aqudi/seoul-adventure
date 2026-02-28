@@ -7,7 +7,7 @@ import {
 } from '@seoul-advanture/schemas';
 
 export const courseRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
-  fastify.get('/courses', { schema: { tags: ['courses'], summary: '코스 목록 조회', response: { 200: CourseListResponseSchema } } }, async (request) => {
+  fastify.get('/courses', { schema: { tags: ['courses'], summary: '코스 목록 조회', } }, async (request) => {
     const em = request.em;
     return em.find(
       Course,

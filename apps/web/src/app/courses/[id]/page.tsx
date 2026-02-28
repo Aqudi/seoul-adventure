@@ -1,44 +1,51 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import GoogleMapView from "@/components/google-map-view";
 import TimerDisplay from "@/components/timer-display";
-
+import { useCourseDetail } from "@/hooks/use-courses";
+import { useAttempt } from "@/hooks/use-attempts";
+import { useQuestStore } from "@/hooks/use-quest-store";
 import { DetailSkeleton } from "@/components/page-skeletons";
-
-// @seoul-advanture/schemas의 CourseDetailResponseSchema 기반 데이터
-const mockCourseDetail = {
-  id: "c1",
-  title: "한양 도성 북문 코스",
-  theme: "조선 왕실의 권위",
-  weekKey: "2024-W09",
-  estimatedDuration: 48,
-  difficulty: "MEDIUM" as const,
-  prologue: "왕실 서고에서 사라진 의궤 단서를 찾으라. 성문마다 남은 기록을 복원해 보자.",
-  epilogue: "모든 단서를 모았군! 그대는 오늘부로 명예 사관이오.",
-  isActive: true,
-  createdAt: new Date().toISOString(),
-  places: [
-    { id: "cp1", order: 1, place: { id: "p1", name: "숙정문", lat: 37.5956, lng: 126.9811, landmarkNames: ["숙정문"] } },
-    { id: "cp2", order: 2, place: { id: "p2", name: "북악산 성곽", lat: 37.5925, lng: 126.9850, landmarkNames: ["성곽길"] } },
-    { id: "cp3", order: 3, place: { id: "p3", name: "창의문", lat: 37.5890, lng: 126.9830, landmarkNames: ["창의문"] } },
-  ],
-  quests: [
-    { id: "q1", order: 1, type: "PHOTO" as const, narrativeText: "[안내관] 첫 번째 관문은 숙정문. 지도를 따라 북쪽 성곽으로 이동하세요.", instruction: "숙정문을 배경으로 셀카를 찍으시오.", mapHint: "북악산 정상 부근" },
-  ]
-};
+import { Loader2 } from "lucide-react";
 
 export default function CourseDetailPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
   
-  // 실제로는 useCourseDetail("c1") 등을 호출하여 loading 상태 확인 가능
-  const isLoading = false; // 현재 목데이터이므로 false
+  const { data: course, isLoading: isCourseLoading, error } = useCourseDetail(id);
+  const { handleStart, isLoading: isStarting } = useAttempt();
+  const startTimer = useQuestStore((state) => state.startQuest);
 
-  if (isLoading) {
+  const difficultyMap = {
+    EASY: "하",
+    MEDIUM: "중",
+    HARD: "상"
+  };
+
+  const onStartAdventure = async () => {
+    if (!id) return;
+    
+    // 1. 서버에 탐험 시작 요청
+    const res = await handleStart({ courseId: id });
+    
+    if (res) {
+      // 2. 로컬 타이머 및 시도 ID 저장
+      startTimer(res.id);
+      // 3. 발급받은 attemptId와 함께 퀘스트 페이지로 이동
+      router.push(`/quests?step=1&courseId=${id}&attemptId=${res.id}`);
+    } else {
+      alert("성문지기가 입장을 불허했소. (서버 연결 실패)");
+    }
+  };
+
+  if (isCourseLoading) {
     return (
       <MobileLayout>
         <div className="flex flex-1 px-6 py-4">
@@ -47,18 +54,28 @@ export default function CourseDetailPage() {
       </MobileLayout>
     );
   }
+
+  if (error || !course) {
+    return (
+      <MobileLayout>
+        <div className="flex flex-1 flex-col items-center justify-center p-10 text-center gap-4">
+          <p className="font-bold text-seoul-text text-lg">존재하지 않거나 비공개된 코스이오.</p>
+          <Button 
+            className="border-[3px] border-seoul-text rounded-none font-bold"
+            onClick={() => router.push("/courses")}
+          >
+            목록으로 돌아가기
+          </Button>
+        </div>
+      </MobileLayout>
+    );
+  }
   
-  const courseSpots = mockCourseDetail.places.map(cp => ({
+  const courseSpots = course.places.map(cp => ({
     lat: cp.place.lat,
     lng: cp.place.lng,
     title: cp.place.name
   }));
-
-  const difficultyMap = {
-    EASY: "하",
-    MEDIUM: "중",
-    HARD: "상"
-  };
 
   return (
     <MobileLayout>
@@ -66,18 +83,18 @@ export default function CourseDetailPage() {
         {/* Header */}
         <div className="flex flex-col gap-2 pt-4 shrink-0">
           <h1 className="text-[42px] font-extrabold leading-[0.9] tracking-[-2px] text-seoul-text">
-            {mockCourseDetail.title}
+            {course.title}
           </h1>
           <p className="text-[13px] font-medium text-[#5C5852]">
-            {mockCourseDetail.quests[0].narrativeText.split('.')[0]}와 함께 4단계 탐험
+            {course.theme} · 4단계 탐험
           </p>
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <Badge variant="outline" className="h-[30px] px-4 justify-center border-2 border-seoul-text bg-[#EBE8E3] rounded-none p-0 text-[12px] font-extrabold tracking-widest text-seoul-text">
-                1 / 4
+                준비 단계
               </Badge>
               <Badge variant="outline" className="h-[30px] px-4 justify-center border-2 border-seoul-text bg-seoul-accent rounded-none p-0 text-[12px] font-extrabold tracking-widest text-white">
-                난이도 {difficultyMap[mockCourseDetail.difficulty]}
+                난이도 {difficultyMap[course.difficulty as keyof typeof difficultyMap]}
               </Badge>
             </div>
             <TimerDisplay />
@@ -89,9 +106,6 @@ export default function CourseDetailPage() {
           <h3 className="text-[18px] font-extrabold text-seoul-text">코스 경로 미리보기</h3>
           <div className="flex-1 bg-[#EBE8E3] border-2 border-seoul-text overflow-hidden relative">
              <GoogleMapView spots={courseSpots} className="w-full h-full" />
-             <div className="absolute top-2 right-2 bg-black/70 text-white text-[10px] p-1 px-2 pointer-events-none">
-                지도 전령 대기 중
-             </div>
           </div>
         </Card>
 
@@ -99,14 +113,14 @@ export default function CourseDetailPage() {
         <Card className="flex flex-col gap-2 border-[3px] border-seoul-text bg-white p-4 rounded-none shrink-0">
           <span className="text-[10px] font-bold tracking-widest text-seoul-muted uppercase">조선왕실톡 PROLOGUE</span>
           <p className="text-[14px] font-medium leading-[1.4] text-seoul-text">
-            {mockCourseDetail.prologue}
+            {course.prologue}
           </p>
         </Card>
 
         {/* Dialog Preview */}
         <Card className="flex flex-col gap-2.5 border-[3px] border-seoul-text bg-white p-3 rounded-none shrink-0">
           <div className="text-[13px] font-medium leading-[1.4] text-seoul-text">
-            {mockCourseDetail.quests[0].narrativeText}
+            {course.quests[0]?.narrativeText || "탐험을 시작할 준비가 되었는가?"}
           </div>
           <div className="text-[13px] font-medium leading-[1.4] text-[#5C5852]">
             [나] 확인! 지금 위치에서 지도 열고 이동할게요.
@@ -117,16 +131,25 @@ export default function CourseDetailPage() {
         <div className="flex h-12 gap-3 mt-auto shrink-0">
           <Button 
             variant="secondary" 
-            onClick={() => router.back()}
+            disabled={isStarting}
+            onClick={() => router.push("/courses")}
             className="flex-1 border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
           >
-            뒤로가기
+            목록으로
           </Button>
           <Button 
-            onClick={() => router.push("/quests?step=1")}
-            className="flex-1 bg-seoul-accent text-white border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
+            onClick={onStartAdventure}
+            disabled={isStarting}
+            className="flex-1 bg-seoul-accent text-white border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)] active:translate-y-0.5"
           >
-            인증하기
+            {isStarting ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>성문 여는 중...</span>
+              </div>
+            ) : (
+              "탐험 시작"
+            )}
           </Button>
         </div>
       </div>

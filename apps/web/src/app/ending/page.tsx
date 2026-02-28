@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuestStore } from "@/hooks/use-quest-store";
 import { useRouter } from "next/navigation";
+import { useMyRank } from "@/hooks/use-leaderboard";
+import { useAttempt } from "@/hooks/use-attempts";
 
 const formatMs = (ms: number) => {
   const seconds = Math.floor((ms / 1000) % 60);
@@ -17,9 +19,14 @@ const formatMs = (ms: number) => {
 
 export default function EndingPage() {
   const router = useRouter();
-  const { capturedImages, resetQuest, startTime } = useQuestStore();
+  const { capturedImages, resetQuest, startTime, attemptId } = useQuestStore();
   
-  const finalTimeMs = startTime ? Date.now() - startTime : 0;
+  // 실제 서버 데이터 (시도 종료 정보) 조회
+  const { data: attempt } = useAttempt(attemptId || undefined);
+  // 내 실제 순위 조회
+  const { data: myRank } = useMyRank(attemptId || "");
+  
+  const finalTimeMs = attempt?.clearTimeMs || (startTime ? Date.now() - startTime : 0);
 
   const imagesArray = Object.entries(capturedImages)
     .sort(([a], [b]) => parseInt(a) - parseInt(b))
@@ -57,23 +64,31 @@ export default function EndingPage() {
           </div>
         </div>
 
+        {/* Result Card - 실시간 순위 및 기록 반영 */}
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
           <CardContent className="p-0 flex flex-col gap-1.5 items-start">
             <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">최종 기록</span>
             <span className="text-[42px] font-extrabold text-seoul-text leading-tight">
               {formatMs(finalTimeMs)}
             </span>
-            <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[11px] font-bold">
-              전체 14위
-            </Badge>
+            {myRank?.rank ? (
+              <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[11px] font-bold">
+                전체 {myRank.rank}위
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="border-seoul-text rounded-none px-2.5 py-1 text-[11px] font-bold animate-pulse">
+                순위 산정 중...
+              </Badge>
+            )}
           </CardContent>
         </Card>
 
+        {/* Epilogue Card - 서버 코스 데이터 기반 */}
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4">
           <CardContent className="p-0 flex flex-col gap-2">
             <h3 className="text-[15px] font-bold text-seoul-text">에필로그</h3>
             <p className="text-[14px] font-medium leading-[1.45] text-seoul-text">
-              모든 단서를 모았군! 그대는 오늘부로 명예 사관이오. 다음 주, 세종대왕의 비밀 편지가 그대를 기다리오.
+              {attempt?.course?.epilogue || "모든 단서를 모았군! 그대는 오늘부로 명예 사관이오. 다음 주, 세종대왕의 비밀 편지가 그대를 기다리오."}
             </p>
           </CardContent>
         </Card>

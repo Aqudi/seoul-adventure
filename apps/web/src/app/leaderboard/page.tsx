@@ -5,6 +5,7 @@ import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLeaderboard, useMyRank } from "@/hooks/use-leaderboard";
+import { useQuestStore } from "@/hooks/use-quest-store";
 
 import { CardListSkeleton } from "@/components/page-skeletons";
 
@@ -18,7 +19,8 @@ const formatMs = (ms: number) => {
 
 export default function LeaderboardPage() {
   const { data: rankings, isLoading } = useLeaderboard();
-  const { data: myRank } = useMyRank("att_1");
+  const attemptId = useQuestStore((state) => state.attemptId);
+  const { data: myRank } = useMyRank(attemptId || ""); 
 
   if (isLoading) {
     return (
@@ -44,12 +46,12 @@ export default function LeaderboardPage() {
           </Button>
         </div>
 
-        {myRank && (
+        {myRank && myRank.rank && (
           <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
             <CardContent className="p-0 flex items-center justify-between">
               <div className="flex flex-col gap-1">
                 <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">나의 최고 기록</span>
-                <span className="text-[17px] font-bold text-seoul-text">tae_hunter (전체 {myRank.rank}위)</span>
+                <span className="text-[17px] font-bold text-seoul-text">현재 순위: {myRank.rank}위</span>
               </div>
               <span className="text-[24px] font-extrabold text-seoul-text">{formatMs(myRank.clearTimeMs || 0)}</span>
             </CardContent>

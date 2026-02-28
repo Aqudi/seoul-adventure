@@ -18,6 +18,7 @@ export default function LoginPage() {
   const onLogin = async () => {
     const res = await handleLogin({ nickname, password });
     if (res) {
+      localStorage.setItem("auth-token", res.token);
       router.push("/courses");
     }
   };
