@@ -4,15 +4,13 @@ import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useQuestStore } from "@/hooks/use-quest-store";
+import { useRouter } from "next/navigation";
 
-// @seoul-advanture/schemas의 AttemptResponseSchema 기반 데이터
 const mockAttemptResult = {
   id: "att_123",
   status: "COMPLETED" as const,
-  startAt: "2024-02-28T14:00:00Z",
-  endAt: "2024-02-28T14:27:43Z",
-  clearTimeMs: 1663000, // 27분 43초
-  questStates: [], // 상세 퀘스트 상태들
+  clearTimeMs: 1663000,
   course: {
     title: "한양 도성 북문 코스",
     epilogue: "모든 단서를 모았군! 그대는 오늘부로 명예 사관이오. 다음 주, 세종대왕의 비밀 편지가 그대를 기다리오."
@@ -28,30 +26,59 @@ const formatMs = (ms: number) => {
 };
 
 export default function EndingPage() {
+  const router = useRouter();
+  const { capturedImages, resetQuest } = useQuestStore();
+  const imagesArray = Object.entries(capturedImages)
+    .sort(([a], [b]) => parseInt(a) - parseInt(b))
+    .map(([_, url]) => url);
+
+  const onNextCourse = () => {
+    resetQuest();
+    router.push("/courses");
+  };
+
   return (
     <MobileLayout>
       <div className="flex flex-1 flex-col gap-4 px-5 py-4 pb-6">
         <h1 className="text-[32px] font-extrabold text-seoul-text">임무 완수</h1>
-        
-        {/* Time Result Card - Schema 데이터 기반 */}
+
+        {/* Progress Photos Slider */}
+        <div className="flex flex-col gap-2">
+          <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">나의 탐험 기록</span>
+          <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
+            {imagesArray.length > 0 ? (
+              imagesArray.map((url, i) => (
+                <div key={i} className="min-w-[280px] h-[200px] snap-center border-[3px] border-seoul-text bg-white overflow-hidden shadow-[4px_4px_0px_0px_rgba(45,42,38,1)] relative">
+                  <img src={url} alt={`Step ${i + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2">
+                    <Badge className="bg-seoul-accent text-white rounded-none border-2 border-seoul-text">
+                      Step {i + 1}
+                    </Badge>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="w-full h-[200px] flex items-center justify-center border-[3px] border-seoul-text border-dashed bg-[#EBE8E3] text-seoul-muted">
+                기록된 사진이 없소.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Result Card */}
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
           <CardContent className="p-0 flex flex-col gap-1.5 items-start">
-            <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">클리어 타임</span>
+            <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">최종 기록</span>
             <span className="text-[42px] font-extrabold text-seoul-text leading-tight">
               {formatMs(mockAttemptResult.clearTimeMs || 0)}
             </span>
-            <div className="flex gap-2">
-               <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[11px] font-bold">
-                 전체 14위
-               </Badge>
-               <Badge variant="outline" className="border-seoul-text rounded-none px-2.5 py-1 text-[11px] font-bold">
-                 {mockAttemptResult.status}
-               </Badge>
-            </div>
+            <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[11px] font-bold">
+              전체 14위
+            </Badge>
           </CardContent>
         </Card>
 
-        {/* Epilogue Card - Course 데이터 기반 */}
+        {/* Epilogue Card */}
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4">
           <CardContent className="p-0 flex flex-col gap-2">
             <h3 className="text-[15px] font-bold text-seoul-text">에필로그</h3>
@@ -61,20 +88,16 @@ export default function EndingPage() {
           </CardContent>
         </Card>
 
-        {/* SNS Share */}
-        <Card className="border-[3px] border-seoul-text rounded-none bg-seoul-muted p-3.5 h-[180px] flex flex-col gap-2.5 shadow-[3px_3px_0px_0px_rgba(45,42,38,1)]">
-          <span className="text-[13px] font-bold text-seoul-muted-foreground">결과 요약 이미지 미리보기</span>
-          <div className="flex flex-1 items-center justify-center bg-white border border-dashed border-seoul-muted-foreground text-[14px] font-semibold text-seoul-muted-foreground">
-            SNS 카드 자동 생성
-          </div>
-        </Card>
-
         <div className="mt-auto flex flex-col gap-3 pt-4">
           <Button className="h-[50px] bg-seoul-text text-seoul-card rounded-none font-bold text-[15px] shadow-[3px_3px_0px_0px_rgba(196,99,78,1)]">
-            인스타그램 공유
+            기록 공유하기
           </Button>
-          <Button variant="secondary" className="h-[46px] border border-seoul-text rounded-none font-bold text-[14px] shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]">
-            다음 코스 도전
+          <Button
+            variant="secondary"
+            onClick={onNextCourse}
+            className="h-[46px] border border-seoul-text rounded-none font-bold text-[14px] shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
+          >
+            다른 코스 도전하기
           </Button>
         </div>
       </div>
