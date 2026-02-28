@@ -7,10 +7,12 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "db:migrate": "mikro-orm migration:up",
-    "db:migrate:create": "mikro-orm migration:create",
+    "db": "TSX_TSCONFIG_PATH=../../tsconfig.json tsx scripts/db.ts",
+    "db:push": "dotenvx run -- pnpm db push",
+    "db:migrate": "",
+    "db:migrate:create": "",
     "db:seed": "tsx src/seed.ts",
-    "db:schema:fresh": "mikro-orm schema:fresh --run"
+    "db:schema:fresh": "pnpm db schema:fresh"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.6.7",

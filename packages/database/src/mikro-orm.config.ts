@@ -10,12 +10,16 @@ import { QuestState } from "./entities/QuestState.js";
 
 export default defineConfig({
   clientUrl:
-    process.env.DATABASE_URL ??
+    process.env.DIRECT_URL ??
     "postgresql://postgres:postgres@localhost:5432/seoul_adventure",
   entities: [User, Place, Course, CoursePlace, Quest, Attempt, QuestState],
   migrations: {
     path: "./src/migrations",
   },
   extensions: [Migrator],
+  schema: "public",
+  schemaGenerator: {
+    ignoreSchema: ["auth", "storage", "realtime", "extensions", "pgbouncer", "net", "supabase_functions", "graphql_public", "vault", "pgsodium"],
+  },
   debug: process.env.NODE_ENV === "development",
 });
