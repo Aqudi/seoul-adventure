@@ -6,8 +6,9 @@ import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import GoogleMapView from "@/components/google-map-view";
-
 import { useCourses } from "@/hooks/use-courses";
+import { CardListSkeleton, HeaderSkeleton } from "@/components/page-skeletons";
+
 
 export default function CoursesPage() {
   const router = useRouter();
@@ -24,8 +25,9 @@ export default function CoursesPage() {
   if (isLoading) {
     return (
       <MobileLayout>
-        <div className="flex flex-1 items-center justify-center">
-          <p className="font-bold text-seoul-text animate-pulse">조선 팔도 코스를 불러오는 중...</p>
+        <div className="flex flex-1 flex-col gap-6 px-5 py-4">
+          <HeaderSkeleton />
+          <CardListSkeleton count={4} />
         </div>
       </MobileLayout>
     );

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLeaderboard, useMyRank } from "@/hooks/use-leaderboard";
 
+import { CardListSkeleton } from "@/components/page-skeletons";
+
 const formatMs = (ms: number) => {
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
@@ -21,8 +23,8 @@ export default function LeaderboardPage() {
   if (isLoading) {
     return (
       <MobileLayout>
-        <div className="flex flex-1 items-center justify-center">
-          <p className="font-bold text-seoul-text animate-pulse">순위표를 불러오는 중...</p>
+        <div className="flex flex-1 flex-col gap-6 px-5 py-4">
+          <CardListSkeleton count={5} />
         </div>
       </MobileLayout>
     );

@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import GoogleMapView from "@/components/google-map-view";
 
+import { DetailSkeleton } from "@/components/page-skeletons";
+
 // @seoul-advanture/schemas의 CourseDetailResponseSchema 기반 데이터
 const mockCourseDetail = {
   id: "c1",
@@ -31,6 +33,19 @@ const mockCourseDetail = {
 
 export default function CourseDetailPage() {
   const router = useRouter();
+  
+  // 실제로는 useCourseDetail("c1") 등을 호출하여 loading 상태 확인 가능
+  const isLoading = false; // 현재 목데이터이므로 false
+
+  if (isLoading) {
+    return (
+      <MobileLayout>
+        <div className="flex flex-1 px-6 py-4">
+          <DetailSkeleton />
+        </div>
+      </MobileLayout>
+    );
+  }
   
   const courseSpots = mockCourseDetail.places.map(cp => ({
     lat: cp.place.lat,
