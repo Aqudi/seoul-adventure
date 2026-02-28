@@ -35,7 +35,6 @@ function QuestVerifyContent() {
   const [isLocating, setIsLocating] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [answer, setAnswer] = useState('');
-  const [aiScore, setAiScore] = useState<number | null>(null);
 
   // 촬영된 실제 파일을 들고 있기 위한 로컬 상태
   const [currentBlob, setCurrentBlob] = useState<Blob | null>(null);
@@ -53,9 +52,6 @@ function QuestVerifyContent() {
     const imageUrl = URL.createObjectURL(blob);
     setCurrentBlob(blob); // 실제 파일 저장
     setIsCameraOpen(false);
-
-    setAiScore(Math.floor(Math.random() * 11) + 90);
-
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -80,7 +76,11 @@ function QuestVerifyContent() {
     try {
       if (currentQuest.type === 'PHOTO') {
         if (!currentBlob) throw new Error('사진 파일이 없소.');
-        const photoResult = await handleVerifyPhoto(currentQuest.id, currentBlob, capturedData?.location);
+        const photoResult = await handleVerifyPhoto(
+          currentQuest.id,
+          currentBlob,
+          capturedData?.location,
+        );
         if ((photoResult as any)?.analysisWarning) {
           alert((photoResult as any).analysisWarning);
         }
@@ -174,13 +174,6 @@ function QuestVerifyContent() {
                   </span>
                 </div>
               )}
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-seoul-text">AI 분석 일치율</span>
-              <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[12px] font-bold">
-                {aiScore ? `${aiScore}% 일치` : '0%'}
-              </Badge>
             </div>
 
             <Button
