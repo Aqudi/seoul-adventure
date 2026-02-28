@@ -37,7 +37,6 @@ importers:
       '@fastify/static':
         specifier: ^8.0.0
         version: 8.3.0
-<<<<<<< HEAD
       '@fastify/swagger':
         specifier: ^9.7.0
         version: 9.7.0
@@ -47,11 +46,9 @@ importers:
       '@fastify/type-provider-typebox':
         specifier: ^6.1.0
         version: 6.1.0(typebox@1.1.5)
-=======
       '@google/genai':
         specifier: ^1.43.0
         version: 1.43.0
->>>>>>> cd2ddda (feat: scenario 생성 추가)
       '@mikro-orm/core':
         specifier: ^6.4.4
         version: 6.6.7
