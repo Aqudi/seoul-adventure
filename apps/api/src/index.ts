@@ -11,6 +11,7 @@ import { courseRoutes } from './routes/courses.js';
 import { attemptRoutes } from './routes/attempts.js';
 import { leaderboardRoutes } from './routes/leaderboard.js';
 import { adminRoutes } from './routes/admin.js';
+import { scenarioRoutes } from './routes/scenarios.js';
 import { ensureUploadDir, UPLOAD_DIR } from './lib/uploadDir.js';
 
 export async function buildServer() {
@@ -32,6 +33,7 @@ export async function buildServer() {
   await fastify.register(attemptRoutes);
   await fastify.register(leaderboardRoutes);
   await fastify.register(adminRoutes);
+  await fastify.register(scenarioRoutes);
 
   return fastify;
 }

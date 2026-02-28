@@ -18,5 +18,7 @@ export { CoursePlace } from "./entities/CoursePlace.js";
 export { Quest, QuestType } from "./entities/Quest.js";
 export { Attempt, AttemptStatus } from "./entities/Attempt.js";
 export { QuestState, QuestStatus } from "./entities/QuestState.js";
+export { Scenario } from "./entities/Scenario.js";
+export { ScenarioQuest, ScenarioQuestType } from "./entities/ScenarioQuest.js";
 export { MikroORM } from "@mikro-orm/postgresql";
 export type { EntityManager } from "@mikro-orm/postgresql";
