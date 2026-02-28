@@ -20,11 +20,11 @@ export function useAttempt(id?: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (typeof id !== 'string') return;
     async function load() {
       setIsLoading(true);
       try {
-        const res = await getAttempt(id);
+        const res = await getAttempt(id as string);
         setData(res);
       } catch (err) {
         setError(err as Error);
