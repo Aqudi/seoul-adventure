@@ -7,49 +7,29 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import GoogleMapView from "@/components/google-map-view";
 
+import { useCourses } from "@/hooks/use-courses";
+
 export default function CoursesPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"map" | "list">("list");
-
-  // @seoul-advanture/schemas 기반 데이터 구조로 변경
-  const courses = [
-    { 
-      id: "c1", 
-      title: "경복궁 근정전", 
-      theme: "조선 왕실의 권위",
-      weekKey: "2024-W09",
-      difficulty: "MEDIUM", 
-      estimatedDuration: 48,
-      isActive: true,
-      places: [{ id: "p1", order: 1, place: { lat: 37.5786, lng: 126.9772, name: "근정전", id: "pl1", landmarkNames: ["근정전"] } }]
-    },
-    { 
-      id: "c2", 
-      title: "창경궁 문정전", 
-      theme: "비극의 역사",
-      weekKey: "2024-W09",
-      difficulty: "EASY", 
-      estimatedDuration: 36,
-      isActive: true,
-      places: [{ id: "p2", order: 1, place: { lat: 37.5800, lng: 126.9918, name: "문정전", id: "pl2", landmarkNames: ["문정전"] } }]
-    },
-    { 
-      id: "c3", 
-      title: "종묘 정전", 
-      theme: "신들의 정원",
-      weekKey: "2024-W09",
-      difficulty: "HARD", 
-      estimatedDuration: 62,
-      isActive: true,
-      places: [{ id: "p3", order: 1, place: { lat: 37.5746, lng: 126.9942, name: "종묘", id: "pl3", landmarkNames: ["종묘"] } }]
-    },
-  ];
+  
+  const { data: courses, isLoading } = useCourses();
 
   const difficultyMap = {
     EASY: "하",
     MEDIUM: "중",
     HARD: "상"
   };
+
+  if (isLoading) {
+    return (
+      <MobileLayout>
+        <div className="flex flex-1 items-center justify-center">
+          <p className="font-bold text-seoul-text animate-pulse">조선 팔도 코스를 불러오는 중...</p>
+        </div>
+      </MobileLayout>
+    );
+  }
 
   return (
     <MobileLayout>

@@ -1,17 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MobileLayout from "@/components/mobile-layout";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { handleLogin, isLoading } = useAuth();
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
+
+  const onLogin = async () => {
+    const res = await handleLogin({ nickname, password });
+    if (res) {
+      router.push("/courses");
+    }
+  };
 
   return (
     <MobileLayout>
       <div className="flex flex-1 flex-col gap-6 px-5 py-[20px] pb-6">
-        {/* Header */}
         <div className="flex flex-col gap-2">
           <h1 className="text-[42px] font-extrabold leading-[0.9] tracking-[-2px] text-seoul-text">
             한양 성문을 열어라
@@ -23,7 +34,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* AI Banner */}
         <div className="flex flex-col gap-2 border-[3px] border-seoul-text bg-seoul-accent p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
           <span className="text-[10px] font-bold tracking-widest text-seoul-card uppercase">
             이번 주 AI 추천 코스
@@ -36,7 +46,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Form */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-[12px] font-bold tracking-widest text-seoul-muted uppercase">
@@ -44,6 +53,8 @@ export default function LoginPage() {
             </label>
             <Input 
               placeholder="이메일 혹은 별호" 
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
               className="h-14 border-[3px] border-seoul-text bg-white px-4 text-base rounded-none focus-visible:ring-0"
             />
           </div>
@@ -55,18 +66,20 @@ export default function LoginPage() {
             <Input 
               type="password"
               placeholder="••••••••" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="h-14 border-[3px] border-seoul-text bg-white px-4 text-base rounded-none focus-visible:ring-0"
             />
           </div>
         </div>
 
-        {/* CTA Buttons */}
         <div className="mt-auto flex flex-col gap-3">
           <Button 
-            onClick={() => router.push("/courses")}
+            onClick={onLogin}
+            disabled={isLoading}
             className="h-14 border-[3px] border-seoul-text bg-seoul-text text-seoul-card hover:bg-seoul-text/90 text-base font-bold rounded-none"
           >
-            탐험 시작
+            {isLoading ? "문 여는 중..." : "탐험 시작"}
           </Button>
           <Button 
             variant="secondary"
