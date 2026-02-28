@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import CameraView from "@/components/camera-view";
-import { Camera as CameraIcon } from "lucide-react";
+import { Camera as CameraIcon, MapPin } from "lucide-react";
 import { useQuestStore } from "@/hooks/use-quest-store";
 import TimerDisplay from "@/components/timer-display";
 import SuccessOverlay from "@/components/success-overlay";
@@ -28,14 +28,34 @@ function QuestVerifyContent() {
   
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   
-  const { capturedImages, setCapturedImage } = useQuestStore();
-  const capturedImage = capturedImages[step];
+  const { capturedImages, setCapturedData } = useQuestStore();
+  const capturedData = capturedImages[step];
 
   const handleCapture = (blob: Blob) => {
     const imageUrl = URL.createObjectURL(blob);
-    setCapturedImage(step, imageUrl);
     setIsCameraOpen(false);
+    
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCapturedData(step, {
+          imageUrl,
+          location: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+        });
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Location capture failed:", error);
+        setCapturedData(step, { imageUrl });
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
   };
 
   const handleVerify = () => {
@@ -77,12 +97,22 @@ function QuestVerifyContent() {
               onClick={() => setIsCameraOpen(true)}
               className="flex h-[240px] items-center justify-center bg-[#EBE8E3] border-2 border-seoul-text border-dashed cursor-pointer overflow-hidden group relative"
             >
-              {capturedImage ? (
-                <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />
+              {capturedData?.imageUrl ? (
+                <div className="relative w-full h-full">
+                  <img src={capturedData.imageUrl} alt="Captured" className="w-full h-full object-cover" />
+                  {capturedData.location && (
+                    <div className="absolute bottom-2 right-2 bg-seoul-text/80 text-white text-[10px] px-2 py-1 flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      위치 기록됨
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="flex flex-col items-center gap-2 text-seoul-muted-foreground group-hover:text-seoul-text text-center p-4">
                   <CameraIcon className="h-12 w-12" />
-                  <span className="font-semibold text-[14px]">이곳을 터치하여<br/>카메라를 깨우시오</span>
+                  <span className="font-semibold text-[14px]">
+                    {isLocating ? "위치 기록 중..." : "이곳을 터치하여\n카메라를 깨우시오"}
+                  </span>
                 </div>
               )}
             </div>
@@ -90,12 +120,12 @@ function QuestVerifyContent() {
             <div className="flex items-center justify-between">
               <span className="text-[13px] font-semibold text-seoul-text">AI 분석 일치율</span>
               <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[12px] font-bold">
-                {capturedImage ? "92% 일치" : "0%"}
+                {capturedData ? "92% 일치" : "0%"}
               </Badge>
             </div>
             
             <Button 
-              disabled={!capturedImage}
+              disabled={!capturedData || isLocating}
               onClick={handleVerify}
               className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full mt-2 shadow-[3px_3px_0px_0px_rgba(196,99,78,1)] active:translate-y-0.5 transition-all"
             >

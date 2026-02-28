@@ -23,7 +23,7 @@ export default function EndingPage() {
 
   const imagesArray = Object.entries(capturedImages)
     .sort(([a], [b]) => parseInt(a) - parseInt(b))
-    .map(([_, url]) => url);
+    .map(([_, data]) => data.imageUrl);
 
   const onNextCourse = () => {
     resetQuest();
@@ -35,7 +35,6 @@ export default function EndingPage() {
       <div className="flex flex-1 flex-col gap-4 px-5 py-4 pb-6">
         <h1 className="text-[32px] font-extrabold text-seoul-text">임무 완수</h1>
 
-        {/* Progress Photos Slider */}
         <div className="flex flex-col gap-2">
           <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">나의 탐험 기록</span>
           <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
@@ -58,7 +57,6 @@ export default function EndingPage() {
           </div>
         </div>
 
-        {/* Result Card */}
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
           <CardContent className="p-0 flex flex-col gap-1.5 items-start">
             <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">최종 기록</span>
@@ -71,7 +69,6 @@ export default function EndingPage() {
           </CardContent>
         </Card>
 
-        {/* Epilogue Card */}
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4">
           <CardContent className="p-0 flex flex-col gap-2">
             <h3 className="text-[15px] font-bold text-seoul-text">에필로그</h3>
