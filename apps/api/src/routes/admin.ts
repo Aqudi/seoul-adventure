@@ -1,14 +1,11 @@
-import type { FastifyInstance } from 'fastify';
-import { Place, Course, CoursePlace, Quest, Difficulty } from '@seoul-advanture/database';
+import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
+import { Place, Course } from '@seoul-advanture/database';
 import {
   CreatePlaceBodySchema,
   GenerateCourseBodySchema,
   UpdateCourseStatusBodySchema,
   AdminCourseParamsSchema,
-  type CreatePlaceBody,
-  type GenerateCourseBody,
-  type UpdateCourseStatusBody,
-  type AdminCourseParams,
+  ErrorSchema,
 } from '@seoul-advanture/schemas';
 
 const ADMIN_KEY = process.env.ADMIN_KEY ?? 'admin-secret';
@@ -20,25 +17,25 @@ const checkAdmin = (request: any, reply: any) => {
   return true;
 };
 
-export async function adminRoutes(fastify: FastifyInstance) {
-  fastify.get('/admin/places', async (request, reply) => {
+export const adminRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
+  fastify.get('/admin/places', { schema: { tags: ['admin'], summary: '장소 목록 조회', security: [{ adminKey: [] }] } }, async (request, reply) => {
     if (!checkAdmin(request, reply)) return;
     return request.em.find(Place, {}, { orderBy: { name: 'ASC' } });
   });
 
-  fastify.post<{ Body: CreatePlaceBody }>('/admin/places', {
-    schema: { body: CreatePlaceBodySchema },
+  fastify.post('/admin/places', {
+    schema: { tags: ['admin'], summary: '장소 생성', security: [{ adminKey: [] }], body: CreatePlaceBodySchema, response: { 401: ErrorSchema } },
   }, async (request, reply) => {
     if (!checkAdmin(request, reply)) return;
-    const place = request.em.create(Place, request.body);
+    const place = request.em.create(Place, request.body as any);
     await request.em.persistAndFlush(place);
-    return place;
+    return place as any;
   });
 
-  fastify.post<{ Body: GenerateCourseBody }>(
+  fastify.post(
     '/admin/courses/generate',
-    { schema: { body: GenerateCourseBodySchema } },
-    async (request, reply) => {
+    { schema: { tags: ['admin'], summary: '코스 생성', security: [{ adminKey: [] }], body: GenerateCourseBodySchema } },
+    async (_request, _reply) => {
       // if (!checkAdmin(request, reply)) return;
       // const { weekKey, placeIds } = request.body;
       // const em = request.em;
@@ -101,15 +98,15 @@ export async function adminRoutes(fastify: FastifyInstance) {
     },
   );
 
-  fastify.patch<{ Params: AdminCourseParams; Body: UpdateCourseStatusBody }>(
+  fastify.patch(
     '/admin/courses/:id/status',
-    { schema: { params: AdminCourseParamsSchema, body: UpdateCourseStatusBodySchema } },
+    { schema: { tags: ['admin'], summary: '코스 상태 변경', security: [{ adminKey: [] }], params: AdminCourseParamsSchema, body: UpdateCourseStatusBodySchema, response: { 401: ErrorSchema } } },
     async (request, reply) => {
       if (!checkAdmin(request, reply)) return;
       const course = await request.em.findOneOrFail(Course, { id: request.params.id });
-      course.isActive = request.body.isActive;
+      course.isActive = request.body.isActive!;
       await request.em.flush();
-      return course;
+      return course as any;
     },
   );
-}
+};

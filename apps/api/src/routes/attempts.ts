@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify';
+import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import {
   Attempt,
   AttemptStatus,
@@ -12,9 +12,7 @@ import {
   StartAttemptBodySchema,
   AttemptParamsSchema,
   QuestCompleteParamsSchema,
-  type StartAttemptBody,
-  type AttemptParams,
-  type QuestCompleteParams,
+  ErrorSchema,
   type CompleteGpsQuestBody,
 } from '@seoul-advanture/schemas';
 import { writeFile } from 'fs/promises';
@@ -23,10 +21,10 @@ import { randomUUID } from 'crypto';
 import { UPLOAD_DIR } from '../lib/uploadDir.js';
 import { haversineDistance } from '../lib/geo.js';
 
-export async function attemptRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Body: StartAttemptBody }>(
+export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
+  fastify.post(
     '/attempts',
-    { onRequest: [fastify.authenticate], schema: { body: StartAttemptBodySchema } },
+    { onRequest: [fastify.authenticate], schema: { tags: ['attempts'], summary: '어드벤처 시작', security: [{ bearerAuth: [] }], body: StartAttemptBodySchema } },
     async (request) => {
       const { userId } = request.user as { userId: string };
       const { courseId } = request.body;
@@ -51,9 +49,9 @@ export async function attemptRoutes(fastify: FastifyInstance) {
     },
   );
 
-  fastify.get<{ Params: AttemptParams }>(
+  fastify.get(
     '/attempts/:attemptId',
-    { onRequest: [fastify.authenticate], schema: { params: AttemptParamsSchema } },
+    { onRequest: [fastify.authenticate], schema: { tags: ['attempts'], summary: '어드벤처 조회', security: [{ bearerAuth: [] }], params: AttemptParamsSchema, response: { 404: ErrorSchema } } },
     async (request, reply) => {
       const { userId } = request.user as { userId: string };
       const em = request.em;
@@ -76,13 +74,13 @@ export async function attemptRoutes(fastify: FastifyInstance) {
       const sortedStates = attempt.questStates
         .getItems()
         .sort((a, b) => a.quest.order - b.quest.order);
-      return { ...attempt, questStates: sortedStates };
+      return { ...attempt, questStates: sortedStates } as any;
     },
   );
 
-  fastify.post<{ Params: QuestCompleteParams }>(
+  fastify.post(
     '/attempts/:attemptId/quests/:questId/complete',
-    { onRequest: [fastify.authenticate], schema: { params: QuestCompleteParamsSchema } },
+    { onRequest: [fastify.authenticate], schema: { tags: ['attempts'], summary: '퀘스트 완료', security: [{ bearerAuth: [] }], params: QuestCompleteParamsSchema, response: { 400: ErrorSchema, 403: ErrorSchema, 422: ErrorSchema, 500: ErrorSchema } } },
     async (request, reply) => {
       const { attemptId, questId } = request.params;
       const { userId } = request.user as { userId: string };
@@ -144,13 +142,13 @@ export async function attemptRoutes(fastify: FastifyInstance) {
       questState.completedAt = new Date();
       await em.flush();
 
-      return questState;
+      return questState as any;
     },
   );
 
-  fastify.post<{ Params: AttemptParams }>(
+  fastify.post(
     '/attempts/:attemptId/finish',
-    { onRequest: [fastify.authenticate], schema: { params: AttemptParamsSchema } },
+    { onRequest: [fastify.authenticate], schema: { tags: ['attempts'], summary: '어드벤처 완료', security: [{ bearerAuth: [] }], params: AttemptParamsSchema, response: { 400: ErrorSchema, 403: ErrorSchema } } },
     async (request, reply) => {
       const { attemptId } = request.params;
       const { userId } = request.user as { userId: string };
@@ -173,7 +171,7 @@ export async function attemptRoutes(fastify: FastifyInstance) {
       attempt.status = AttemptStatus.COMPLETED;
       await em.flush();
 
-      return attempt;
+      return attempt as any;
     },
   );
-}
+};

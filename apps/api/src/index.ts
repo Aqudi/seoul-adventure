@@ -1,9 +1,11 @@
 import Fastify from 'fastify';
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import staticPlugin from '@fastify/static';
 import ormPlugin from './plugins/orm.js';
 import jwtPlugin from './plugins/jwt.js';
+import swaggerPlugin from './plugins/swagger.js';
 import { authRoutes } from './routes/auth.js';
 import { courseRoutes } from './routes/courses.js';
 import { attemptRoutes } from './routes/attempts.js';
@@ -12,9 +14,10 @@ import { adminRoutes } from './routes/admin.js';
 import { ensureUploadDir, UPLOAD_DIR } from './lib/uploadDir.js';
 
 export async function buildServer() {
-  const fastify = Fastify({ logger: true });
+  const fastify = Fastify({ logger: true }).withTypeProvider<TypeBoxTypeProvider>();
 
   await fastify.register(cors, { origin: '*' });
+  await fastify.register(swaggerPlugin);
   await fastify.register(ormPlugin);
   await fastify.register(jwtPlugin);
 

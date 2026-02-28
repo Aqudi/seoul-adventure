@@ -1,13 +1,13 @@
-import type { FastifyInstance } from 'fastify';
+import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { Course } from '@seoul-advanture/database';
 import {
   CourseParamsSchema,
   CourseListResponseSchema,
-  type CourseParams,
+  ErrorSchema,
 } from '@seoul-advanture/schemas';
 
-export async function courseRoutes(fastify: FastifyInstance) {
-  fastify.get('/courses', { schema: { response: { 200: CourseListResponseSchema } } }, async (request) => {
+export const courseRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
+  fastify.get('/courses', { schema: { tags: ['courses'], summary: '코스 목록 조회', response: { 200: CourseListResponseSchema } } }, async (request) => {
     const em = request.em;
     return em.find(
       Course,
@@ -16,11 +16,11 @@ export async function courseRoutes(fastify: FastifyInstance) {
         populate: ['places', 'places.place'],
         orderBy: { weekKey: 'DESC' },
       },
-    );
+    ) as any;
   });
 
-  fastify.get<{ Params: CourseParams }>('/courses/:id', {
-    schema: { params: CourseParamsSchema },
+  fastify.get('/courses/:id', {
+    schema: { tags: ['courses'], summary: '코스 상세 조회', params: CourseParamsSchema, response: { 404: ErrorSchema } },
   }, async (request, reply) => {
     const em = request.em;
 
@@ -37,6 +37,6 @@ export async function courseRoutes(fastify: FastifyInstance) {
       return safe;
     });
 
-    return { ...course, quests };
+    return { ...course, quests } as any;
   });
-}
+};

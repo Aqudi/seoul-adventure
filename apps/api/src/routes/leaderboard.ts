@@ -1,15 +1,13 @@
-import type { FastifyInstance } from 'fastify';
+import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { Attempt, AttemptStatus } from '@seoul-advanture/database';
 import {
   LeaderboardParamsSchema,
   MyRankQuerySchema,
-  type LeaderboardParams,
-  type MyRankQuery,
 } from '@seoul-advanture/schemas';
 
-export async function leaderboardRoutes(fastify: FastifyInstance) {
-  fastify.get<{ Params: LeaderboardParams }>('/leaderboard/:courseId', {
-    schema: { params: LeaderboardParamsSchema },
+export const leaderboardRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
+  fastify.get('/leaderboard/:courseId', {
+    schema: { tags: ['leaderboard'], summary: '리더보드 조회', params: LeaderboardParamsSchema },
   }, async (request) => {
     const em = request.em;
 
@@ -31,27 +29,27 @@ export async function leaderboardRoutes(fastify: FastifyInstance) {
     }));
   });
 
-  fastify.get<{ Params: LeaderboardParams; Querystring: MyRankQuery }>(
+  fastify.get(
     '/leaderboard/:courseId/my-rank',
     {
       onRequest: [fastify.authenticate],
-      schema: { params: LeaderboardParamsSchema, querystring: MyRankQuerySchema },
+      schema: { tags: ['leaderboard'], summary: '내 순위 조회', security: [{ bearerAuth: [] }], params: LeaderboardParamsSchema, querystring: MyRankQuerySchema },
     },
     async (request) => {
-    const { courseId } = request.params;
-    const { attemptId } = request.query;
-    const em = request.em;
+      const { courseId } = request.params;
+      const { attemptId } = request.query;
+      const em = request.em;
 
-    const myAttempt = await em.findOne(Attempt, { id: attemptId });
-    if (myAttempt?.status !== AttemptStatus.COMPLETED) return { rank: null };
+      const myAttempt = await em.findOne(Attempt, { id: attemptId });
+      if (myAttempt?.status !== AttemptStatus.COMPLETED) return { rank: null };
 
-    const betterCount = await em.count(Attempt, {
-      course: { id: courseId },
-      status: AttemptStatus.COMPLETED,
-      clearTimeMs: { $lt: myAttempt.clearTimeMs! },
-    });
+      const betterCount = await em.count(Attempt, {
+        course: { id: courseId },
+        status: AttemptStatus.COMPLETED,
+        clearTimeMs: { $lt: myAttempt.clearTimeMs! },
+      });
 
-    return { rank: betterCount + 1, clearTimeMs: myAttempt.clearTimeMs };
+      return { rank: betterCount + 1, clearTimeMs: myAttempt.clearTimeMs };
     },
   );
-}
+};
