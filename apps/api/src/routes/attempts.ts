@@ -140,7 +140,8 @@ export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
             quest.instruction,
             quest.narrativeText,
           );
-          if (!analysis.passed && analysis.confidence >= 0.7) {
+          console.info(analysis);
+          if (!analysis.passed) {
             return reply.code(422).send({ error: analysis.reason });
           }
         }
