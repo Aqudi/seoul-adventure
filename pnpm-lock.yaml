@@ -32,6 +32,9 @@ importers:
       '@seoul-advanture/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@seoul-advanture/prettier-config':
+        specifier: workspace:*
+        version: link:../../packages/prettier-config
       '@seoul-advanture/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -63,6 +66,9 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
     devDependencies:
+      '@seoul-advanture/prettier-config':
+        specifier: workspace:*
+        version: link:../../packages/prettier-config
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.2.1
@@ -89,6 +95,8 @@ importers:
         version: 5.9.3
 
   packages/eslint-config: {}
+
+  packages/prettier-config: {}
 
   packages/typescript-config: {}
 
