@@ -89,7 +89,7 @@ function QuestMainContent() {
 
       {/* Dialog Section */}
       <Card className="flex flex-1 flex-col gap-3 border-[3px] border-seoul-text bg-white p-4 rounded-none overflow-hidden">
-        <span className="text-[14px] font-bold text-seoul-text text-center border-b-2 border-seoul-text pb-2">조선왕실톡</span>
+        <span className="text-[14px] font-bold text-seoul-text text-center border-b-2 border-seoul-text pb-2">탐험톡</span>
         
         <div className="flex flex-col gap-4 py-2 overflow-y-auto">
           <div className="flex flex-col gap-1">

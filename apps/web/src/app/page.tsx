@@ -84,12 +84,6 @@ export default function LoginPage() {
           >
             {isLoading ? "문 여는 중..." : "탐험 시작"}
           </Button>
-          <Button 
-            variant="secondary"
-            className="h-14 border-[3px] border-seoul-text text-base font-bold rounded-none shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
-          >
-            신입 수문군 등록
-          </Button>
         </div>
       </div>
     </MobileLayout>

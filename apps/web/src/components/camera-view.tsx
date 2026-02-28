@@ -42,6 +42,14 @@ export default function CameraView({ onCapture, onClose }: Props) {
     };
   }, []);
 
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    onClose();
+  };
+
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
@@ -63,7 +71,7 @@ export default function CameraView({ onCapture, onClose }: Props) {
     <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center">
       {/* Header */}
       <div className="absolute top-0 w-full p-4 flex justify-end">
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-white">
+        <Button variant="ghost" size="icon" onClick={stopCamera} className="text-white">
           <X className="h-8 w-8" />
         </Button>
       </div>

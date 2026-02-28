@@ -106,7 +106,7 @@ export default function CourseDetailPage() {
 
         {/* Prologue Card */}
         <Card className="flex flex-col gap-2 border-[3px] border-seoul-text bg-white p-4 rounded-none shrink-0">
-          <span className="text-[10px] font-bold tracking-widest text-seoul-muted uppercase">조선왕실톡 PROLOGUE</span>
+          <span className="text-[10px] font-bold tracking-widest text-seoul-muted uppercase">PROLOGUE</span>
           <p className="text-[14px] font-medium leading-[1.4] text-seoul-text">
             {course.prologue}
           </p>

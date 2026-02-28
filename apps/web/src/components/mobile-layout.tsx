@@ -4,8 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import TimerDisplay from './timer-display';
-
+export function StatusBar() {
+  return (
+    <div className="flex h-[62px] items-center justify-end px-5 shrink-0 pt-4 bg-transparent">
+      <span className="font-sans text-[12px] font-bold text-seoul-text ml-auto"></span>
+    </div>
+  );
+}
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -44,13 +49,18 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
   // Don't show BottomNav on the login page (index)
   const showBottomNav = pathname !== '/';
 
+  // 페이지별 배경색 지정 (기본값 #fafafa, 상세/퀘스트는 #F5F2ED)
+  const isAltBg = pathname.startsWith('/courses/') || pathname.startsWith('/quests');
+  const bgColor = isAltBg ? 'bg-[#F5F2ED]' : 'bg-[#fafafa]';
+
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[#fafafa]">
-      <div className="flex min-h-screen w-full max-w-[420px] flex-col border-x border-seoul-text bg-[#fafafa] shadow-2xl overflow-hidden">
-        <div className="flex-1 overflow-y-auto flex flex-col">
+    <div className={`flex min-h-screen flex-col items-center bg-[#fafafa]`}>
+      <div className={`flex min-h-screen w-full max-w-[420px] flex-col border-x border-seoul-text ${bgColor} shadow-2xl overflow-hidden`}>
+        <StatusBar />
+        <div className="flex-1 overflow-y-auto flex flex-col pb-10">
           {children}
         </div>
-        {showBottomNav && <BottomNav />}
+        {/* {showBottomNav && <BottomNav />} */}
       </div>
     </div>
   );
