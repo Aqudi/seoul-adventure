@@ -6,7 +6,7 @@ interface RequestOptions extends RequestInit {
 
 export async function apiClient<T>(endpoint: string, { params, ...options }: RequestOptions = {}): Promise<T> {
   const url = new URL(`${API_BASE_URL}${endpoint}`);
-
+  
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       url.searchParams.append(key, String(value));
@@ -16,7 +16,12 @@ export async function apiClient<T>(endpoint: string, { params, ...options }: Req
   const token = typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
 
   const headers = new Headers(options.headers);
-  headers.set("Content-Type", "application/json");
+  
+  // body가 FormData가 아닐 때만 JSON 헤더 설정
+  if (!(options.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+  
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }

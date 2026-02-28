@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useMemo, useEffect } from "react";
+import { useState, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ function QuestVerifyContent() {
   const attemptId = searchParams.get("attemptId");
   const courseId = searchParams.get("courseId");
 
-  const { data: attempt, isLoading, handleVerifyAnswer } = useAttempt(attemptId || undefined);
+  const { data: attempt, isLoading, handleVerifyAnswer, handleVerifyPhoto } = useAttempt(attemptId || undefined);
   
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -30,6 +30,9 @@ function QuestVerifyContent() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [answer, setAnswer] = useState("");
   const [aiScore, setAiScore] = useState<number | null>(null);
+  
+  // 촬영된 실제 파일을 들고 있기 위한 로컬 상태
+  const [currentBlob, setCurrentBlob] = useState<Blob | null>(null);
   
   const { capturedImages, setCapturedData } = useQuestStore();
   const capturedData = capturedImages[step];
@@ -42,6 +45,7 @@ function QuestVerifyContent() {
 
   const handleCapture = (blob: Blob) => {
     const imageUrl = URL.createObjectURL(blob);
+    setCurrentBlob(blob); // 실제 파일 저장
     setIsCameraOpen(false);
     
     setAiScore(Math.floor(Math.random() * 11) + 90);
@@ -68,9 +72,17 @@ function QuestVerifyContent() {
     
     setIsVerifying(true);
     try {
-      await handleVerifyAnswer(currentQuest.id, { answer: currentQuest.type === 'PHOTO' ? 'VERIFIED_BY_PHOTO' : answer });
+      if (currentQuest.type === 'PHOTO') {
+        if (!currentBlob) throw new Error("사진 파일이 없소.");
+        // PHOTO 타입이면 실제 블롭 파일을 전송
+        await handleVerifyPhoto(currentQuest.id, currentBlob, capturedData?.location);
+      } else {
+        // ANSWER 타입이면 정답 텍스트를 전송
+        await handleVerifyAnswer(currentQuest.id, { answer });
+      }
       setShowSuccess(true);
     } catch (err) {
+      console.error(err);
       alert("인증에 실패했소. 다시 시도해 주시오.");
     } finally {
       setIsVerifying(false);
@@ -155,7 +167,12 @@ function QuestVerifyContent() {
               onClick={handleVerify}
               className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full mt-2 shadow-[3px_3px_0px_0px_rgba(196,99,78,1)] active:translate-y-0.5 transition-all"
             >
-              {isVerifying ? <Loader2 className="animate-spin h-5 w-5" /> : (step === attempt.questStates.length ? "최종 임무 완수" : "인증하고 다음으로")}
+              {isVerifying ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="animate-spin h-5 w-5" />
+                  <span>인증 중...</span>
+                </div>
+              ) : (step === attempt.questStates.length ? "최종 임무 완수" : "인증하고 다음으로")}
             </Button>
           </CardContent>
         </Card>
@@ -179,7 +196,12 @@ function QuestVerifyContent() {
               onClick={handleVerify}
               className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full shadow-[3px_3px_0px_0px_rgba(196,99,78,1)] active:translate-y-0.5 transition-all"
             >
-              {isVerifying ? <Loader2 className="animate-spin h-5 w-5" /> : (step === attempt.questStates.length ? "최종 임무 완수" : "암호 확인 및 다음으로")}
+              {isVerifying ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="animate-spin h-5 w-5" />
+                  <span>검증 중...</span>
+                </div>
+              ) : (step === attempt.questStates.length ? "최종 임무 완수" : "암호 확인 및 다음으로")}
             </Button>
           </CardContent>
         </Card>
