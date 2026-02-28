@@ -97,7 +97,7 @@ export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
         return reply.code(400).send({ error: '이미 완료된 퀘스트입니다.' });
       }
 
-      const isMultipart = request.headers['content-type']?.includes('multipart');
+      const isMultipart = request.isMultipart();
 
       if (quest.type === 'PHOTO') {
         if (!isMultipart) return reply.code(400).send({ error: '사진을 업로드해야 합니다.' });
