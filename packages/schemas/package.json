@@ -1,0 +1,17 @@
+{
+  "name": "@seoul-advanture/schemas",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.32.35"
+  },
+  "devDependencies": {
+    "@seoul-advanture/typescript-config": "workspace:*",
+    "typescript": "^5.4.5"
+  }
+}

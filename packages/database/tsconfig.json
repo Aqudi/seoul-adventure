@@ -1,7 +1,6 @@
 {
-  "extends": "@seoul-advanture/typescript-config/fastify.json",
+  "extends": "@seoul-advanture/typescript-config/base.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -10,6 +9,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*"
+  ]
 }

@@ -1,68 +1,42 @@
-import "reflect-metadata";
-import Fastify from "fastify";
-import cors from "@fastify/cors";
-import cookie from "@fastify/cookie";
-import type { FastifyInstance } from "fastify";
-import { initDb, getOrm, closeDb } from "./db/index.js";
-import { userRoutes } from "./routes/users.js";
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import multipart from '@fastify/multipart';
+import staticPlugin from '@fastify/static';
+import ormPlugin from './plugins/orm.js';
+import jwtPlugin from './plugins/jwt.js';
+import { authRoutes } from './routes/auth.js';
+import { courseRoutes } from './routes/courses.js';
+import { attemptRoutes } from './routes/attempts.js';
+import { leaderboardRoutes } from './routes/leaderboard.js';
+import { adminRoutes } from './routes/admin.js';
+import { ensureUploadDir, UPLOAD_DIR } from './lib/uploadDir.js';
 
-declare module "fastify" {
-  interface FastifyInstance {
-    orm: Awaited<ReturnType<typeof initDb>>;
-  }
-}
+export async function buildServer() {
+  const fastify = Fastify({ logger: true });
 
+  await fastify.register(cors, { origin: '*' });
+  await fastify.register(ormPlugin);
+  await fastify.register(jwtPlugin);
 
-const fastify = Fastify({ logger: true });
+  await ensureUploadDir();
+  await fastify.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
+  await fastify.register(staticPlugin, { root: UPLOAD_DIR, prefix: '/uploads/' });
 
-async function buildServer() {
-  const orm = await initDb();
-  fastify.decorate("orm", orm);
+  fastify.get('/health', async () => ({ status: 'ok' }));
 
-  await fastify.register(cookie, {
-    secret: process.env.COOKIE_SECRET ?? process.env.JWT_SECRET ?? "dev-cookie-secret",
-  });
-
-  await fastify.register(cors, {
-    origin: "*", // Adjust for production
-    credentials: true,
-  });
-
-  fastify.get("/health", async () => {
-    return { status: "ok", message: "Seoul Advanture API is running" };
-  });
-
-  fastify.get("/db", async (request, reply) => {
-    const orm = getOrm();
-    if (!orm) {
-      return reply.status(503).send({ status: "error", message: "Database not initialized" });
-    }
-    const em = orm.em.fork();
-    const isConnected = await em.getConnection().isConnected();
-    return {
-      status: "ok",
-      database: isConnected ? "connected" : "disconnected",
-    };
-  });
-
-  await fastify.register(userRoutes);
-
-  fastify.addHook("onClose", async (instance: FastifyInstance) => {
-    await closeDb();
-  });
+  await fastify.register(authRoutes);
+  await fastify.register(courseRoutes);
+  await fastify.register(attemptRoutes);
+  await fastify.register(leaderboardRoutes);
+  await fastify.register(adminRoutes);
 
   return fastify;
 }
 
-const start = async () => {
-  try {
+if (process.env.NODE_ENV !== 'test') {
+  const start = async () => {
     const server = await buildServer();
     await server.listen({ port: 3001, host: '0.0.0.0' });
-    console.log(`Server listening on port 3001`);
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-
-start();
+  };
+  start().catch(console.error);
+}

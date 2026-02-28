@@ -1,0 +1,36 @@
+{
+  "name": "@seoul-advanture/database",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:migrate": "mikro-orm migration:up",
+    "db:migrate:create": "mikro-orm migration:create",
+    "db:seed": "tsx src/seed.ts",
+    "db:schema:fresh": "mikro-orm schema:fresh --run"
+  },
+  "dependencies": {
+    "@mikro-orm/core": "^6.4.4",
+    "@mikro-orm/migrations": "^6.4.4",
+    "@mikro-orm/postgresql": "^6.4.4",
+    "uuid": "^9.0.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@mikro-orm/cli": "^6.4.4",
+    "@seoul-advanture/typescript-config": "workspace:*",
+    "@types/uuid": "^9.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.4.5"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/mikro-orm.config.ts"
+    ]
+  }
+}
