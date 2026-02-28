@@ -1,13 +1,10 @@
 {
-    "extends": "@seoul-advanture/typescript-config/fastify.json",
-    "compilerOptions": {
-        "outDir": "dist"
-    },
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "extends": "@seoul-advanture/typescript-config/fastify.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
