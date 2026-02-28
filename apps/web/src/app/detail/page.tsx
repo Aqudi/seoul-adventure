@@ -1,12 +1,16 @@
-import MobileLayout, { StatusBar, BottomNav } from "@/components/mobile-layout";
+"use client";
+
+import { useRouter } from "next/navigation";
+import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export default function CourseDetailPage() {
+  const router = useRouter();
+
   return (
     <MobileLayout>
-      <StatusBar />
       <div className="flex flex-1 flex-col gap-6 px-6 py-0 pb-6 bg-[#F5F2ED]">
         {/* Header */}
         <div className="flex flex-col gap-2 pt-4">
@@ -51,16 +55,22 @@ export default function CourseDetailPage() {
         </Card>
 
         {/* CTA Buttons */}
-        <div className="flex h-12 gap-3">
-          <Button variant="secondary" className="flex-1 border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]">
-            지도보기
+        <div className="flex h-12 gap-3 mt-auto">
+          <Button 
+            variant="secondary" 
+            onClick={() => router.back()}
+            className="flex-1 border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
+          >
+            뒤로가기
           </Button>
-          <Button className="flex-1 bg-seoul-accent text-white border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]">
+          <Button 
+            onClick={() => router.push("/quests")}
+            className="flex-1 bg-seoul-accent text-white border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
+          >
             인증하기
           </Button>
         </div>
       </div>
-      <BottomNav />
     </MobileLayout>
   );
 }

@@ -1,4 +1,7 @@
-import MobileLayout, { StatusBar } from "@/components/mobile-layout";
+"use client";
+
+import { useRouter } from "next/navigation";
+import MobileLayout from "@/components/mobile-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function QuestVerifyPage() {
+  const router = useRouter();
+
   return (
     <MobileLayout>
-      <StatusBar />
       <div className="flex flex-1 flex-col gap-4 px-5 py-4 pb-6">
         <h1 className="text-[32px] font-extrabold text-seoul-text">퀘스트 인증</h1>
         
@@ -30,7 +34,7 @@ export default function QuestVerifyPage() {
         </Tabs>
 
         {/* Photo Card */}
-        <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4">
+        <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[3px_3px_0px_0px_rgba(45,42,38,1)]">
           <CardContent className="p-0 flex flex-col gap-3">
             <h3 className="text-[16px] font-bold text-seoul-text">유형 A · 광화문 해태상 셀카</h3>
             <div className="flex h-[140px] items-center justify-center bg-seoul-muted text-seoul-muted-foreground font-semibold text-[14px]">
@@ -46,7 +50,7 @@ export default function QuestVerifyPage() {
         </Card>
 
         {/* Password Card */}
-        <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4">
+        <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[3px_3px_0px_0px_rgba(45,42,38,1)]">
           <CardContent className="p-0 flex flex-col gap-3">
             <h3 className="text-[16px] font-bold text-seoul-text">유형 B · 역사 팩트 비밀번호</h3>
             <p className="text-[13px] font-medium leading-[1.4] text-seoul-muted">
@@ -54,9 +58,12 @@ export default function QuestVerifyPage() {
             </p>
             <Input 
               placeholder="정답 숫자 입력" 
-              className="h-12 border border-seoul-text rounded-none bg-white px-3 text-[14px] font-medium"
+              className="h-12 border border-seoul-text rounded-none bg-white px-3 text-[14px] font-medium focus-visible:ring-0"
             />
-            <Button className="h-[46px] bg-seoul-text text-seoul-card rounded-none font-bold text-[14px] w-full">
+            <Button 
+              onClick={() => router.push("/ending")}
+              className="h-[46px] bg-seoul-text text-seoul-card rounded-none font-bold text-[14px] w-full"
+            >
               인증하기
             </Button>
           </CardContent>
