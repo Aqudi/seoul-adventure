@@ -1,177 +1,190 @@
-# 시나리오 생성 API 개발 문서
+# Scenario API 명세
 
-## 개요
-
-Gemini API를 활용하여 랜드마크 기반의 방탈출 게임 시나리오를 자동 생성하고, 생성된 시나리오를 데이터베이스에 저장 및 조회하는 API입니다.
+Gemini AI를 활용한 방탈출 시나리오 생성 및 조회 API입니다.
 
 ---
 
-## DB 설계
-
-### Scenario 테이블
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | UUID (PK) | 기본 키 |
-| landmark | VARCHAR | 랜드마크 이름 |
-| game_title | VARCHAR | 게임 제목 |
-| prologue | TEXT | 시나리오 프롤로그 |
-| epilogue | TEXT | 시나리오 에필로그 |
-| created_at | TIMESTAMP | 생성 일시 |
-
-### ScenarioQuest 테이블
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | UUID (PK) | 기본 키 |
-| scenario_id | UUID (FK) | Scenario 참조 |
-| step | INTEGER | 퀘스트 순서 (1~4) |
-| type | ENUM | PHOTO / PASSWORD |
-| title | VARCHAR | 퀘스트 제목 |
-| location_name | VARCHAR | 장소명 |
-| latitude | FLOAT | 위도 |
-| longitude | FLOAT | 경도 |
-| scenario_text | TEXT | 퀘스트 내러티브 |
-| question | TEXT (nullable) | PASSWORD 퀘스트 질문 |
-| answer | VARCHAR (nullable) | PASSWORD 퀘스트 정답 |
-| fact_info | TEXT | 장소 관련 실제 역사/정보 |
-| success_msg | TEXT | 성공 메시지 |
-| failure_msg | TEXT | 실패 메시지 |
-
-### ERD
+## Base URL
 
 ```
-Scenario (1) ──< ScenarioQuest (N)
+http://localhost:3001
 ```
 
 ---
 
-## 환경 변수
+## Endpoints
 
-`.env`에 아래 항목을 추가해야 합니다.
+### 1. 시나리오 생성
+
+랜드마크 이름을 입력하면 Gemini AI가 방탈출 시나리오를 생성하고 DB에 저장합니다.
 
 ```
-GEMINI_API_KEY=your-gemini-api-key
+POST /scenarios/generate
 ```
 
-Google AI Studio(https://aistudio.google.com/)에서 API 키를 발급받을 수 있습니다.
+**Request**
 
----
+| 위치 | 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|------|
+| Body | `landmark` | string | ✅ | 시나리오를 생성할 랜드마크 이름 |
 
-## API 명세
-
-### POST /scenarios/generate
-
-랜드마크 이름을 입력받아 Gemini API로 시나리오를 생성하고 DB에 저장합니다.
-
-**Request Body**
 ```json
 {
   "landmark": "경복궁"
 }
 ```
 
-**Response (201)**
+**Response `201`**
+
 ```json
 {
-  "id": "uuid",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "landmark": "경복궁",
   "gameTitle": "경복궁의 비밀: 사라진 옥새를 찾아라",
   "prologue": "이보게, 자네 소문 들었나?...",
-  "epilogue": "훌륭하구먼!...",
+  "epilogue": "훌륭하구먼! 자네 덕분에...",
   "createdAt": "2024-01-01T00:00:00.000Z",
   "quests": [
     {
-      "id": "uuid",
+      "id": "660e8400-e29b-41d4-a716-446655440001",
       "step": 1,
       "type": "PHOTO",
       "title": "근정전: 왕권의 상징",
       "locationName": "근정전 앞",
       "latitude": 37.5796,
       "longitude": 126.9770,
-      "scenarioText": "가장 먼저...",
+      "scenarioText": "가장 먼저 근정전으로 향하게나...",
       "question": null,
-      "factInfo": "근정전은...",
-      "successMsg": "오오!...",
-      "failureMsg": "음..."
+      "factInfo": "근정전은 조선 시대 임금이 신하들과 조회를 열던 곳입니다.",
+      "successMsg": "오오! 근정전의 기운이 담겼구먼!",
+      "failureMsg": "음... 건물이 잘 보이지 않네. 다시 찍어보게나."
+    },
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440002",
+      "step": 2,
+      "type": "PASSWORD",
+      "title": "광화문: 숨겨진 숫자",
+      "locationName": "광화문 현판 앞",
+      "latitude": 37.5759,
+      "longitude": 126.9769,
+      "scenarioText": "광화문 현판에 새겨진 글자를 자세히 보게나...",
+      "question": "광화문 홍예문은 총 몇 개인가?",
+      "factInfo": "광화문은 경복궁의 정문으로 1395년에 처음 건립되었습니다.",
+      "successMsg": "정답일세! 문이 열리는구먼!",
+      "failureMsg": "허허, 틀렸네. 다시 세어보게나."
     }
   ]
 }
 ```
 
-**Error Response (502)** - Gemini API 호출 실패 시
+> `answer` 필드는 보안상 응답에서 제외됩니다.
+
+**Response `400`** - 요청 형식 오류
+
 ```json
-{ "error": "Gemini API error (400): ..." }
+{
+  "statusCode": 400,
+  "error": "Bad Request",
+  "message": "body/landmark must NOT have fewer than 1 characters"
+}
+```
+
+**Response `502`** - Gemini API 호출 실패
+
+```json
+{
+  "error": "GEMINI_API_KEY environment variable is not set"
+}
 ```
 
 ---
 
-### GET /scenarios
+### 2. 시나리오 목록 조회
 
-저장된 모든 시나리오 목록을 반환합니다 (최신순).
+저장된 모든 시나리오의 요약 목록을 최신순으로 반환합니다.
 
-**Response (200)**
+```
+GET /scenarios
+```
+
+**Request** - 없음
+
+**Response `200`**
+
 ```json
 [
   {
-    "id": "uuid",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "landmark": "경복궁",
     "gameTitle": "경복궁의 비밀: 사라진 옥새를 찾아라",
     "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "landmark": "세빛 둥둥섬",
+    "gameTitle": "세빛 유람기: 사라진 삼색 구슬의 비밀",
+    "createdAt": "2023-12-31T00:00:00.000Z"
   }
 ]
 ```
 
 ---
 
-### GET /scenarios/:id
+### 3. 시나리오 상세 조회
 
-시나리오 ID로 상세 데이터를 조회합니다.
+시나리오 ID로 전체 퀘스트 데이터를 조회합니다.
 
-**Response (200)** - POST /scenarios/generate 와 동일한 구조
+```
+GET /scenarios/:id
+```
 
-**Error Response (404)**
+**Request**
+
+| 위치 | 필드 | 타입 | 설명 |
+|------|------|------|------|
+| Path | `id` | string (UUID) | 시나리오 ID |
+
+**Response `200`** - `POST /scenarios/generate` 응답과 동일한 구조
+
+**Response `404`**
+
 ```json
-{ "error": "시나리오를 찾을 수 없습니다." }
+{
+  "error": "시나리오를 찾을 수 없습니다."
+}
 ```
 
 ---
 
-## Gemini 프롬프트 구조
+## Quest 타입 상세
 
-### 시스템 인스트럭션
-
-```
-당신은 위치 기반 야외 방탈출 게임의 전문 시나리오 작가입니다.
-입력받은 '랜드마크'를 주제로 팩트와 픽션이 결합된 몰입감 있는 게임 시나리오를 작성하세요.
-```
-
-### 프롬프트 조건
-
-- **컨셉**: 사용자를 '조선시대 사관'으로 설정, 사극 말투(~하오, ~하구먼, ~하게나) 사용
-- **구성**: 총 4단계 퀘스트 (PHOTO 2개 + PASSWORD 2개)
-- **데이터 정확성**: 실제 위/경도 좌표 반영, 실제 현장 팩트 기반 퀴즈
-- **응답 형식**: JSON (`response_mime_type: application/json`)
+| 타입 | 설명 | `question` | `answer` |
+|------|------|------|------|
+| `PHOTO` | 해당 장소에서 사진 촬영 인증 | `null` | `null` |
+| `PASSWORD` | 역사적 팩트 기반 비밀번호 입력 | 질문 텍스트 | (응답 제외) |
 
 ---
 
-## 파일 구조
+## Quest 객체 필드
 
-```
-apps/api/src/
-├── services/
-│   └── gemini.ts          # Gemini API 호출 서비스
-└── routes/
-    └── scenarios.ts       # 시나리오 CRUD 라우트
-
-packages/database/src/entities/
-├── Scenario.ts            # Scenario 엔티티
-└── ScenarioQuest.ts       # ScenarioQuest 엔티티
-```
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | string (UUID) | 퀘스트 ID |
+| `step` | number (1~4) | 퀘스트 순서 |
+| `type` | `PHOTO` \| `PASSWORD` | 퀘스트 유형 |
+| `title` | string | 퀘스트 제목 |
+| `locationName` | string | 장소명 |
+| `latitude` | number | 위도 |
+| `longitude` | number | 경도 |
+| `scenarioText` | string | 사극 말투 내러티브 |
+| `question` | string \| null | PASSWORD 퀘스트 질문 |
+| `factInfo` | string | 장소 역사/사실 정보 |
+| `successMsg` | string | 성공 시 메시지 |
+| `failureMsg` | string | 실패 시 메시지 |
 
 ---
 
-## 사용 예시 (curl)
+## curl 예시
 
 ```bash
 # 시나리오 생성
@@ -182,6 +195,6 @@ curl -X POST http://localhost:3001/scenarios/generate \
 # 전체 목록 조회
 curl http://localhost:3001/scenarios
 
-# ID로 상세 조회
-curl http://localhost:3001/scenarios/{id}
+# 상세 조회
+curl http://localhost:3001/scenarios/550e8400-e29b-41d4-a716-446655440000
 ```
