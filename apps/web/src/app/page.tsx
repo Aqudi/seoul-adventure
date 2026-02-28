@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MobileLayout from "@/components/mobile-layout";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuestStore } from "@/hooks/use-quest-store";
 
 export default function LoginPage() {
   const router = useRouter();
   const { handleLogin, isLoading } = useAuth();
+  const startQuest = useQuestStore((state) => state.startQuest);
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
 

@@ -7,16 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { useQuestStore } from "@/hooks/use-quest-store";
 import { useRouter } from "next/navigation";
 
-const mockAttemptResult = {
-  id: "att_123",
-  status: "COMPLETED" as const,
-  clearTimeMs: 1663000,
-  course: {
-    title: "한양 도성 북문 코스",
-    epilogue: "모든 단서를 모았군! 그대는 오늘부로 명예 사관이오. 다음 주, 세종대왕의 비밀 편지가 그대를 기다리오."
-  }
-};
-
 const formatMs = (ms: number) => {
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
@@ -27,7 +17,10 @@ const formatMs = (ms: number) => {
 
 export default function EndingPage() {
   const router = useRouter();
-  const { capturedImages, resetQuest } = useQuestStore();
+  const { capturedImages, resetQuest, startTime } = useQuestStore();
+  
+  const finalTimeMs = startTime ? Date.now() - startTime : 0;
+
   const imagesArray = Object.entries(capturedImages)
     .sort(([a], [b]) => parseInt(a) - parseInt(b))
     .map(([_, url]) => url);
@@ -70,7 +63,7 @@ export default function EndingPage() {
           <CardContent className="p-0 flex flex-col gap-1.5 items-start">
             <span className="text-[13px] font-bold text-seoul-muted uppercase tracking-tight">최종 기록</span>
             <span className="text-[42px] font-extrabold text-seoul-text leading-tight">
-              {formatMs(mockAttemptResult.clearTimeMs || 0)}
+              {formatMs(finalTimeMs)}
             </span>
             <Badge className="bg-seoul-text text-seoul-card rounded-none px-2.5 py-1 text-[11px] font-bold">
               전체 14위
@@ -83,7 +76,7 @@ export default function EndingPage() {
           <CardContent className="p-0 flex flex-col gap-2">
             <h3 className="text-[15px] font-bold text-seoul-text">에필로그</h3>
             <p className="text-[14px] font-medium leading-[1.45] text-seoul-text">
-              {mockAttemptResult.course.epilogue}
+              모든 단서를 모았군! 그대는 오늘부로 명예 사관이오. 다음 주, 세종대왕의 비밀 편지가 그대를 기다리오.
             </p>
           </CardContent>
         </Card>

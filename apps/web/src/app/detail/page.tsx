@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import GoogleMapView from "@/components/google-map-view";
+import TimerDisplay from "@/components/timer-display";
 
 import { DetailSkeleton } from "@/components/page-skeletons";
 
@@ -70,13 +71,16 @@ export default function CourseDetailPage() {
           <p className="text-[13px] font-medium text-[#5C5852]">
             {mockCourseDetail.quests[0].narrativeText.split('.')[0]}와 함께 4단계 탐험
           </p>
-          <div className="flex gap-2">
-            <Badge variant="outline" className="h-[30px] px-4 justify-center border-2 border-seoul-text bg-[#EBE8E3] rounded-none p-0 text-[12px] font-extrabold tracking-widest text-seoul-text">
-              1 / 4
-            </Badge>
-            <Badge variant="outline" className="h-[30px] px-4 justify-center border-2 border-seoul-text bg-seoul-accent rounded-none p-0 text-[12px] font-extrabold tracking-widest text-white">
-              난이도 {difficultyMap[mockCourseDetail.difficulty]}
-            </Badge>
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2">
+              <Badge variant="outline" className="h-[30px] px-4 justify-center border-2 border-seoul-text bg-[#EBE8E3] rounded-none p-0 text-[12px] font-extrabold tracking-widest text-seoul-text">
+                1 / 4
+              </Badge>
+              <Badge variant="outline" className="h-[30px] px-4 justify-center border-2 border-seoul-text bg-seoul-accent rounded-none p-0 text-[12px] font-extrabold tracking-widest text-white">
+                난이도 {difficultyMap[mockCourseDetail.difficulty]}
+              </Badge>
+            </div>
+            <TimerDisplay />
           </div>
         </div>
 
@@ -86,7 +90,7 @@ export default function CourseDetailPage() {
           <div className="flex-1 bg-[#EBE8E3] border-2 border-seoul-text overflow-hidden relative">
              <GoogleMapView spots={courseSpots} className="w-full h-full" />
              <div className="absolute top-2 right-2 bg-black/70 text-white text-[10px] p-1 px-2 pointer-events-none">
-                API Key required
+                지도 전령 대기 중
              </div>
           </div>
         </Card>
@@ -119,7 +123,7 @@ export default function CourseDetailPage() {
             뒤로가기
           </Button>
           <Button 
-            onClick={() => router.push("/quests")}
+            onClick={() => router.push("/quests?step=1")}
             className="flex-1 bg-seoul-accent text-white border-[3px] border-seoul-text rounded-none font-bold text-[14px] h-full shadow-[2px_2px_0px_0px_rgba(45,42,38,1)]"
           >
             인증하기

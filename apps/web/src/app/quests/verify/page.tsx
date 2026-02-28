@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CameraView from "@/components/camera-view";
 import { Camera as CameraIcon } from "lucide-react";
 import { useQuestStore } from "@/hooks/use-quest-store";
+import TimerDisplay from "@/components/timer-display";
+import SuccessOverlay from "@/components/success-overlay";
 
-// 스키마의 QuestType 기반으로 각 단계의 미션 타입 정의
 const stepConfigs: Record<number, { type: 'PHOTO' | 'ANSWER' | 'GPS_TIME', hint: string }> = {
   1: { type: 'PHOTO', hint: "숙정문 현판이 잘 보이게 찍으시오." },
   2: { type: 'ANSWER', hint: "건립 연도의 마지막 숫자 4자리를 입력하시오." },
@@ -27,8 +27,10 @@ function QuestVerifyContent() {
   const config = stepConfigs[step] || stepConfigs[1];
   
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  
   const { capturedImages, setCapturedImage } = useQuestStore();
-  const capturedImage = capturedImages[step] || null;
+  const capturedImage = capturedImages[step];
 
   const handleCapture = (blob: Blob) => {
     const imageUrl = URL.createObjectURL(blob);
@@ -36,7 +38,12 @@ function QuestVerifyContent() {
     setIsCameraOpen(false);
   };
 
-  const onComplete = () => {
+  const handleVerify = () => {
+    setShowSuccess(true);
+  };
+
+  const onNext = () => {
+    setShowSuccess(false);
     if (step < 4) {
       router.push(`/quests?step=${step + 1}`);
     } else {
@@ -49,15 +56,17 @@ function QuestVerifyContent() {
       <h1 className="text-[32px] font-extrabold text-seoul-text">퀘스트 인증</h1>
       
       <div className="flex items-center justify-between">
-        <Badge variant="secondary" className="border-2 border-seoul-text rounded-none px-3 py-1.5 text-[12px] font-bold">
-          {step} / 4 단계
-        </Badge>
-        <Badge className="bg-seoul-accent text-white rounded-none border-2 border-seoul-text px-3 py-1.5 text-[12px] font-bold">
-          미션 유형: {config.type === 'PHOTO' ? '사진 촬영' : '정답 입력'}
-        </Badge>
+        <div className="flex gap-2">
+          <Badge variant="secondary" className="border-2 border-seoul-text rounded-none px-3 py-1.5 text-[12px] font-bold">
+            {step} / 4 단계
+          </Badge>
+          <Badge className="bg-seoul-accent text-white rounded-none border-2 border-seoul-text px-3 py-1.5 text-[12px] font-bold">
+            {config.type === 'PHOTO' ? '사진 촬영' : '정답 입력'}
+          </Badge>
+        </div>
+        <TimerDisplay />
       </div>
 
-      {/* 스키마의 type에 따라 다른 UI 노출 */}
       {config.type === 'PHOTO' ? (
         <Card className="border-[3px] border-seoul-text rounded-none bg-white p-4 shadow-[4px_4px_0px_0px_rgba(45,42,38,1)]">
           <CardContent className="p-0 flex flex-col gap-3">
@@ -66,7 +75,7 @@ function QuestVerifyContent() {
             
             <div 
               onClick={() => setIsCameraOpen(true)}
-              className="flex h-[220px] items-center justify-center bg-[#EBE8E3] border-2 border-seoul-text border-dashed cursor-pointer overflow-hidden group relative"
+              className="flex h-[240px] items-center justify-center bg-[#EBE8E3] border-2 border-seoul-text border-dashed cursor-pointer overflow-hidden group relative"
             >
               {capturedImage ? (
                 <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />
@@ -87,8 +96,8 @@ function QuestVerifyContent() {
             
             <Button 
               disabled={!capturedImage}
-              onClick={onComplete}
-              className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full mt-2"
+              onClick={handleVerify}
+              className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full mt-2 shadow-[3px_3px_0px_0px_rgba(196,99,78,1)] active:translate-y-0.5 transition-all"
             >
               {step === 4 ? "최종 임무 완수" : "인증하고 다음으로"}
             </Button>
@@ -108,8 +117,8 @@ function QuestVerifyContent() {
               className="h-14 border-2 border-seoul-text rounded-none bg-white px-4 text-[16px] font-bold focus-visible:ring-0"
             />
             <Button 
-              onClick={onComplete}
-              className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full"
+              onClick={handleVerify}
+              className="h-[56px] bg-seoul-text text-seoul-card rounded-none font-bold text-[16px] w-full shadow-[3px_3px_0px_0px_rgba(196,99,78,1)] active:translate-y-0.5 transition-all"
             >
               {step === 4 ? "최종 임무 완수" : "암호 확인 및 다음으로"}
             </Button>
@@ -117,11 +126,18 @@ function QuestVerifyContent() {
         </Card>
       )}
 
-      {/* Fullscreen Camera Modal */}
       {isCameraOpen && (
         <CameraView 
           onCapture={handleCapture} 
           onClose={() => setIsCameraOpen(false)} 
+        />
+      )}
+
+      {showSuccess && (
+        <SuccessOverlay 
+          step={step} 
+          onNext={onNext} 
+          isLast={step === 4} 
         />
       )}
     </div>

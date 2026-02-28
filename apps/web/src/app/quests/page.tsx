@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Suspense } from "react";
+import TimerDisplay from "@/components/timer-display";
 
-// 단계별 시나리오 데이터
 const stepData: Record<number, any> = {
   1: {
     chapter: "CHAPTER 01",
@@ -48,16 +48,19 @@ function QuestMainContent() {
   return (
     <div className="flex flex-1 flex-col gap-6 px-6 py-0 pb-6 bg-[#F5F2ED]">
       {/* Header */}
-      <div className="flex flex-col gap-2 pt-4">
+      <div className="flex flex-col gap-2 pt-4 shrink-0">
         <h1 className="text-[42px] font-extrabold leading-[0.9] tracking-[-2px] text-seoul-text">
           퀘스트 메인
         </h1>
         <p className="text-[13px] font-medium text-[#5C5852]">
           조선왕실톡 시나리오 진행 중
         </p>
-        <Badge className="h-[30px] w-[80px] justify-center border-2 border-seoul-text bg-seoul-accent rounded-none p-0 text-[12px] font-extrabold tracking-widest text-seoul-card">
-          {step} / 4
-        </Badge>
+        <div className="flex items-center justify-between">
+          <Badge className="h-[30px] w-[80px] justify-center border-2 border-seoul-text bg-seoul-accent rounded-none p-0 text-[12px] font-extrabold tracking-widest text-seoul-card">
+            {step} / 4
+          </Badge>
+          <TimerDisplay />
+        </div>
       </div>
 
       {/* Chapter Card */}
@@ -73,14 +76,12 @@ function QuestMainContent() {
       <Card className="flex flex-1 flex-col gap-3 border-[3px] border-seoul-text bg-white p-4 rounded-none">
         <span className="text-[14px] font-bold text-seoul-text">시나리오 대화</span>
         
-        {/* NPC Bubble */}
         <div className="flex flex-col gap-2 border-2 border-seoul-text bg-[#EBE8E3] p-3">
            <p className="text-[13px] font-medium leading-[1.4] text-seoul-text">
             {currentData.npc}
            </p>
         </div>
 
-        {/* User Bubble */}
         <div className="flex flex-col gap-2 border-2 border-seoul-text bg-seoul-accent p-3 ml-4">
            <p className="text-[13px] font-medium leading-[1.4] text-seoul-card">
             {currentData.user}

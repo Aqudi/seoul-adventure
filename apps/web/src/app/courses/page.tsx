@@ -9,11 +9,19 @@ import GoogleMapView from "@/components/google-map-view";
 import { useCourses } from "@/hooks/use-courses";
 import { CardListSkeleton, HeaderSkeleton } from "@/components/page-skeletons";
 
+import { useQuestStore } from "@/hooks/use-quest-store";
+
 function CoursesContent() {
   const router = useRouter();
+  const startQuest = useQuestStore((state) => state.startQuest);
   const [activeTab, setActiveTab] = useState<"map" | "list">("list");
   
   const { data: courses, isLoading } = useCourses();
+
+  const onSelectCourse = (id: string) => {
+    startQuest(); // 코스 선택 시 타이머 시작
+    router.push("/detail");
+  };
 
   const difficultyMap = {
     EASY: "하",
@@ -90,7 +98,7 @@ function CoursesContent() {
               {courses.map((course) => (
                 <Card 
                   key={course.id} 
-                  onClick={() => router.push("/detail")}
+                  onClick={() => onSelectCourse(course.id)}
                   className="border-[3px] border-seoul-text rounded-none shadow-[3px_3px_0px_0px_rgba(45,42,38,1)] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(45,42,38,1)] transition-all cursor-pointer bg-white"
                 >
                   <CardHeader className="p-4 space-y-2">

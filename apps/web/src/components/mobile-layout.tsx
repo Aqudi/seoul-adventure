@@ -4,10 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import TimerDisplay from './timer-display';
+
 export function StatusBar() {
   return (
-    <div className="flex h-[24px] items-center justify-between px-5 shrink-0">
-      {/* Status Bar icons removed as requested */}
+    <div className="flex h-[40px] items-center justify-end px-5 shrink-0 pt-2">
+      <span className="font-sans text-[12px] font-bold text-seoul-text">5G 100%</span>
     </div>
   );
 }
