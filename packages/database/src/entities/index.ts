@@ -5,3 +5,5 @@ export { CoursePlace } from './CoursePlace.js';
 export { Quest, QuestType } from './Quest.js';
 export { Attempt, AttemptStatus } from './Attempt.js';
 export { QuestState, QuestStatus } from './QuestState.js';
+export { Scenario } from './Scenario.js';
+export { ScenarioQuest, ScenarioQuestType } from './ScenarioQuest.js';

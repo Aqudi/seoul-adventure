@@ -7,12 +7,14 @@ import { CoursePlace } from "./entities/CoursePlace.js";
 import { Quest } from "./entities/Quest.js";
 import { Attempt } from "./entities/Attempt.js";
 import { QuestState } from "./entities/QuestState.js";
+import { Scenario } from "./entities/Scenario.js";
+import { ScenarioQuest } from "./entities/ScenarioQuest.js";
 
 export default defineConfig({
   clientUrl:
     process.env.DIRECT_URL ??
     "postgresql://postgres:postgres@localhost:5432/seoul_adventure",
-  entities: [User, Place, Course, CoursePlace, Quest, Attempt, QuestState],
+  entities: [User, Place, Course, CoursePlace, Quest, Attempt, QuestState, Scenario, ScenarioQuest],
   migrations: {
     path: "./src/migrations",
   },
