@@ -51,8 +51,10 @@ export async function analyzePhoto(
 
   try {
     const text = response.text ?? '';
+    console.info('[photoAnalyzer] raw response:', text);
     return JSON.parse(text) as PhotoAnalysisResult;
-  } catch {
+  } catch (e) {
+    console.error('[photoAnalyzer] JSON parse failed:', e, 'raw:', response.text);
     return { passed: false, reason: '사진 분석에 실패했습니다.', confidence: 0 };
   }
 }

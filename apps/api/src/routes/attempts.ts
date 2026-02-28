@@ -132,6 +132,7 @@ export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
         }
 
         // AI 사진 분석: GEMINI_API_KEY가 설정된 경우에만 실행
+        let analysisWarning: string | undefined;
         if (process.env.GEMINI_API_KEY) {
           const mimeType: string = data.mimetype || 'image/jpeg';
           const analysis = await analyzePhoto(
@@ -140,11 +141,16 @@ export const attemptRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
             quest.instruction,
             quest.narrativeText,
           );
-          console.info(analysis);
+          console.info('[analysis result]', analysis);
           if (!analysis.passed) {
-            return reply.code(422).send({ error: analysis.reason });
+            analysisWarning = analysis.reason;
           }
         }
+
+        questState.status = QuestStatus.COMPLETED;
+        questState.completedAt = new Date();
+        await em.flush();
+        return { ...questState, analysisWarning } as any;
       }
 
       if (quest.type === 'ANSWER') {

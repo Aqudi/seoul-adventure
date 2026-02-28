@@ -7,6 +7,7 @@ import {
   completeAnswerQuest,
   completeGpsQuest,
   completePhotoQuest,
+  finishAttempt,
 } from "@/lib/api/attempts";
 import {
   AttemptResponse,
@@ -75,5 +76,12 @@ export function useAttempt(id?: string) {
     return res;
   };
 
-  return { data, isLoading, error, handleStart, handleVerifyAnswer, handleVerifyGps, handleVerifyPhoto };
+  const handleFinish = async () => {
+    if (!data) return null;
+    const res = await finishAttempt(data.id);
+    setData(res);
+    return res;
+  };
+
+  return { data, isLoading, error, handleStart, handleVerifyAnswer, handleVerifyGps, handleVerifyPhoto, handleFinish };
 }

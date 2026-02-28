@@ -27,6 +27,7 @@ function QuestVerifyContent() {
     isLoading,
     handleVerifyAnswer,
     handleVerifyPhoto,
+    handleFinish,
   } = useAttempt(attemptId || undefined);
 
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -79,11 +80,9 @@ function QuestVerifyContent() {
     try {
       if (currentQuest.type === 'PHOTO') {
         if (!currentBlob) throw new Error('사진 파일이 없소.');
-        try {
-          await handleVerifyPhoto(currentQuest.id, currentBlob, capturedData?.location);
-        } catch (photoErr: any) {
-          // 데모용: 에러가 있으면 메시지만 보여주고 성공 처리
-          if (photoErr?.message) alert(photoErr.message);
+        const photoResult = await handleVerifyPhoto(currentQuest.id, currentBlob, capturedData?.location);
+        if ((photoResult as any)?.analysisWarning) {
+          alert((photoResult as any).analysisWarning);
         }
       } else {
         // ANSWER 타입이면 정답 텍스트를 전송
@@ -98,11 +97,12 @@ function QuestVerifyContent() {
     }
   };
 
-  const onNext = () => {
+  const onNext = async () => {
     setShowSuccess(false);
     if (step < (attempt?.questStates?.length || 4)) {
       router.push(`/quests?step=${step + 1}&courseId=${courseId}&attemptId=${attemptId}`);
     } else {
+      await handleFinish().catch(console.error);
       router.push('/ending');
     }
   };

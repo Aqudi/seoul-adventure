@@ -65,3 +65,13 @@ export async function completeGpsQuest(attemptId: string, questId: string, body:
     body: JSON.stringify(body),
   });
 }
+
+/**
+ * 어드벤처 종료 (clearTimeMs 기록)
+ */
+export async function finishAttempt(attemptId: string): Promise<AttemptResponse> {
+  return apiClient<AttemptResponse>(`/attempts/${attemptId}/finish`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
