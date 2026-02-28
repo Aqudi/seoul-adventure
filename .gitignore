@@ -11,3 +11,5 @@ coverage
 out/
 next-env.d.ts
 build/
+
+.omc
