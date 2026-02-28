@@ -1,6 +1,5 @@
 import type { FastifyInstance } from 'fastify';
 import { Place, Course, CoursePlace, Quest, Difficulty } from '@seoul-advanture/database';
-import { generateCourse } from '../services/aiCourseGenerator.js';
 import {
   CreatePlaceBodySchema,
   GenerateCourseBodySchema,
@@ -40,64 +39,65 @@ export async function adminRoutes(fastify: FastifyInstance) {
     '/admin/courses/generate',
     { schema: { body: GenerateCourseBodySchema } },
     async (request, reply) => {
-      if (!checkAdmin(request, reply)) return;
-      const { weekKey, placeIds } = request.body;
-      const em = request.em;
+      // if (!checkAdmin(request, reply)) return;
+      // const { weekKey, placeIds } = request.body;
+      // const em = request.em;
 
-      const places = await em.find(Place, { id: { $in: placeIds } });
-      const ordered = placeIds.map((id) => places.find((p) => p.id === id)!).filter(Boolean);
+      // const places = await em.find(Place, { id: { $in: placeIds } });
+      // const ordered = placeIds.map((id) => places.find((p) => p.id === id)!).filter(Boolean);
 
-      const generated = await generateCourse(
-        ordered.map((p) => ({
-          name: p.name,
-          lat: p.lat,
-          lng: p.lng,
-          landmarkNames: p.landmarkNames,
-          facts: p.facts as Record<string, unknown>,
-        })),
-      );
+      // const generated = await generateCourse(
+      //   ordered.map((p) => ({
+      //     name: p.name,
+      //     lat: p.lat,
+      //     lng: p.lng,
+      //     landmarkNames: p.landmarkNames,
+      //     facts: p.facts as Record<string, unknown>,
+      //   })),
+      // );
 
-      const course = em.create(Course, {
-        title: generated.title,
-        theme: generated.theme,
-        weekKey,
-        estimatedDuration: generated.estimatedDuration,
-        difficulty: generated.difficulty as Difficulty,
-        prologue: generated.prologue,
-        epilogue: generated.epilogue,
-        isActive: false,
-      });
-      em.persist(course);
+      // const course = em.create(Course, {
+      //   title: generated.title,
+      //   theme: generated.theme,
+      //   weekKey,
+      //   estimatedDuration: generated.estimatedDuration,
+      //   difficulty: generated.difficulty as Difficulty,
+      //   prologue: generated.prologue,
+      //   epilogue: generated.epilogue,
+      //   isActive: false,
+      // });
+      // em.persist(course);
 
-      for (let i = 0; i < ordered.length; i++) {
-        em.persist(em.create(CoursePlace, { course, place: ordered[i], order: i + 1 }));
-      }
+      // for (let i = 0; i < ordered.length; i++) {
+      //   em.persist(em.create(CoursePlace, { course, place: ordered[i], order: i + 1 }));
+      // }
 
-      for (const q of generated.quests) {
-        em.persist(
-          em.create(Quest, {
-            course,
-            place: ordered[q.placeIndex],
-            order: q.order,
-            type: q.type as any,
-            narrativeText: q.narrativeText,
-            instruction: q.instruction,
-            mapHint: q.mapHint,
-            answer: q.answer ?? undefined,
-            gpsLatOverride: undefined,
-            gpsLngOverride: undefined,
-            gpsRadiusM: q.gpsRadiusM ?? undefined,
-            timeLimitSec: q.timeLimitSec ?? undefined,
-          }),
-        );
-      }
+      // for (const q of generated.quests) {
+      //   em.persist(
+      //     em.create(Quest, {
+      //       course,
+      //       place: ordered[q.placeIndex],
+      //       order: q.order,
+      //       type: q.type as any,
+      //       narrativeText: q.narrativeText,
+      //       instruction: q.instruction,
+      //       mapHint: q.mapHint,
+      //       answer: q.answer ?? undefined,
+      //       gpsLatOverride: undefined,
+      //       gpsLngOverride: undefined,
+      //       gpsRadiusM: q.gpsRadiusM ?? undefined,
+      //       timeLimitSec: q.timeLimitSec ?? undefined,
+      //     }),
+      //   );
+      // }
 
-      await em.flush();
-      return em.findOneOrFail(
-        Course,
-        { id: course.id },
-        { populate: ['quests', 'places', 'places.place'] },
-      );
+      // await em.flush();
+      // return em.findOneOrFail(
+      //   Course,
+      //   { id: course.id },
+      //   { populate: ['quests', 'places', 'places.place'] },
+      // );
+      throw Error("Not implemented");
     },
   );
 
