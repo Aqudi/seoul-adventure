@@ -1,0 +1,7 @@
+{
+  "extends": "./packages/typescript-config/base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}

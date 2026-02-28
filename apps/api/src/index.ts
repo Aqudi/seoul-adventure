@@ -36,7 +36,7 @@ export async function buildServer() {
 if (process.env.NODE_ENV !== 'test') {
   const start = async () => {
     const server = await buildServer();
-    await server.listen({ port: 3001, host: '0.0.0.0' });
+    await server.listen({ port: parseInt(process.env.PORT ?? '3001'), host: '0.0.0.0' });
   };
   start().catch(console.error);
 }

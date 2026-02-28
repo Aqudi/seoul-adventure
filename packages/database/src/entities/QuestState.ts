@@ -1,17 +1,25 @@
-import { Entity, PrimaryKey, Property, Enum, ManyToOne, Unique, OptionalProps } from '@mikro-orm/core';
-import { v4 as uuid } from 'uuid';
-import { Attempt } from './Attempt.js';
-import { Quest } from './Quest.js';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  Enum,
+  ManyToOne,
+  Unique,
+  OptionalProps,
+} from "@mikro-orm/core";
+import { v4 as uuid } from "uuid";
+import { Attempt } from "./Attempt.js";
+import { Quest } from "./Quest.js";
 
 export enum QuestStatus {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
 }
 
 @Entity()
-@Unique({ properties: ['attempt', 'quest'] })
+@Unique({ properties: ["attempt", "quest"] })
 export class QuestState {
-  [OptionalProps]?: 'status' | 'completedAt' | 'photoUrl';
+  [OptionalProps]?: "status" | "completedAt" | "photoUrl";
 
   @PrimaryKey()
   id: string = uuid();

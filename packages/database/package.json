@@ -13,19 +13,19 @@
     "db:schema:fresh": "mikro-orm schema:fresh --run"
   },
   "dependencies": {
-    "@mikro-orm/core": "^6.4.4",
-    "@mikro-orm/migrations": "^6.4.4",
-    "@mikro-orm/postgresql": "^6.4.4",
-    "uuid": "^9.0.0",
-    "bcryptjs": "^2.4.3"
+    "@mikro-orm/core": "^6.6.7",
+    "@mikro-orm/migrations": "^6.6.7",
+    "@mikro-orm/postgresql": "^6.6.7",
+    "uuid": "^13.0.0",
+    "bcryptjs": "^3.0.3"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^6.4.4",
+    "@mikro-orm/cli": "^6.6.7",
     "@seoul-advanture/typescript-config": "workspace:*",
-    "@types/uuid": "^9.0.0",
-    "@types/bcryptjs": "^2.4.6",
-    "tsx": "^4.19.2",
-    "typescript": "^5.4.5"
+    "@types/uuid": "^11.0.0",
+    "@types/bcryptjs": "^3.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "mikro-orm": {
     "useTsNode": true,
